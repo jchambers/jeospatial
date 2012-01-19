@@ -1,0 +1,66 @@
+<project name="jeospatial" basedir="." default="dist">
+	<property name="src" location="src"/>
+	<property name="src.test" location="test"/>
+	
+	<property name="doc" location="doc"/>
+	<property name="doc.javadoc" location="${doc}/javadoc"/>
+	
+	<property name="build" location="build"/>
+	<property name="build.test" location="build-test"/>
+	
+	<property name="distfile" location="jeospatial.jar"/>
+	
+	<property name="junit.location" location="./junit-4.10.jar"/>
+	
+	<target name="init">
+		<mkdir dir="${build}"/>
+		<mkdir dir="${build.test}"/>
+		<mkdir dir="${doc}"/>
+		<mkdir dir="${doc.javadoc}"/>
+	</target>
+	
+	<target name="build" depends="init">
+		<javac includeantruntime="false" srcdir="${src}" destdir="${build}"/>
+	</target>
+	
+	<target name="test-build" depends="build">
+		<javac includeantruntime="false" srcdir="${src.test}" destdir="${build.test}">
+			<classpath>
+				<pathelement path="${junit.location}"/>
+				<pathelement path="${build}"/>
+			</classpath>
+		</javac>
+	</target>
+	
+	<target name="test" depends="test-build">
+		<junit printsummary="on">
+			<classpath>
+				<pathelement path="${junit.location}"/>
+				<pathelement path="${build}"/>
+				<pathelement path="${build.test}"/>
+			</classpath>
+			
+			<batchtest>
+				<fileset dir="${build.test}"/>
+			</batchtest>
+		</junit>
+	</target>
+	
+	<target name="doc">
+		<javadoc sourcepath="${src}" destdir="${doc.javadoc}">
+			<link href="http://docs.oracle.com/javase/6/docs/api/"/>
+		</javadoc>
+	</target>
+	
+	<target name="dist" depends="build">
+		<jar basedir="${build}" destfile="${distfile}"/>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build}"/>
+		<delete dir="${build.test}"/>
+		<delete dir="${doc}"/>
+		
+		<delete file="${distfile}"/>
+	</target>
+</project>
