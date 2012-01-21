@@ -12,7 +12,7 @@ import com.eatthepath.jeospatial.GeospatialPoint;
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  */
 public class GeospatialDistanceComparator<T extends GeospatialPoint> implements Comparator<T> {
-	private final GeospatialPoint origin;
+	private final CachingGeospatialPoint origin;
 	
 	/**
 	 * Constructs a new comparator that sorts geospatial points according to
