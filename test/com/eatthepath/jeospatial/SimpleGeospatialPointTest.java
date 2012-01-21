@@ -66,5 +66,4 @@ public class SimpleGeospatialPointTest {
 		assertEquals("Distance between diametrically opposed points should be within 1m of 20015086m.",
 				20015086, a.getDistanceTo(b), 1d);
 	}
-
 }

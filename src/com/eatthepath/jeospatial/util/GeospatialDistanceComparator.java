@@ -2,6 +2,7 @@ package com.eatthepath.jeospatial.util;
 
 import java.util.Comparator;
 
+import com.eatthepath.jeospatial.CachingGeospatialPoint;
 import com.eatthepath.jeospatial.GeospatialPoint;
 
 /**
@@ -21,7 +22,7 @@ public class GeospatialDistanceComparator<T extends GeospatialPoint> implements 
 	 *            the point from which to measure other points
 	 */
 	public GeospatialDistanceComparator(GeospatialPoint origin) {
-		this.origin = origin;
+		this.origin = new CachingGeospatialPoint(origin);
 	}
 	
 	/**

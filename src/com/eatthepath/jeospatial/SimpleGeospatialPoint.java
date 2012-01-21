@@ -21,8 +21,8 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 	 * @param longitude the longitude of this point in degrees
 	 */
 	public SimpleGeospatialPoint(double latitude, double longitude) {
-		this.latitude = latitude;
-		this.longitude = longitude;
+		this.setLatitude(latitude);
+		this.setLongitude(longitude);
 	}
 	
 	/**
@@ -32,8 +32,7 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 	 * @param p the point whose location should be used for this point
 	 */
 	public SimpleGeospatialPoint(GeospatialPoint p) {
-		this.latitude = p.getLatitude();
-		this.longitude = p.getLongitude();
+		this(p.getLatitude(), p.getLongitude());
 	}
 	
 	/**
