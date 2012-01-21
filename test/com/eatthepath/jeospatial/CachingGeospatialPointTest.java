@@ -119,6 +119,21 @@ public class CachingGeospatialPointTest {
         
         assertTrue("Caching calculations should be faster than non-caching calculations.",
                 cachingTime < simpleTime);
-
+    }
+    
+    @Test
+    public void testHashCode() {
+        SimpleGeospatialPoint simplePoint = new SimpleGeospatialPoint(10, 20);
+        CachingGeospatialPoint cachingPoint = new CachingGeospatialPoint(10, 20);
+        
+        assertEquals(simplePoint.hashCode(), cachingPoint.hashCode());
+    }
+    
+    @Test
+    public void testEquals() {
+        SimpleGeospatialPoint simplePoint = new SimpleGeospatialPoint(10, 20);
+        CachingGeospatialPoint cachingPoint = new CachingGeospatialPoint(10, 20);
+        
+        assertTrue(simplePoint.equals(cachingPoint));
     }
 }

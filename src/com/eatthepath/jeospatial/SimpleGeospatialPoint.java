@@ -110,13 +110,13 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 		final int prime = 31;
 		int result = 1;
 		long temp;
-		temp = Double.doubleToLongBits(latitude);
+		temp = Double.doubleToLongBits(this.getLatitude());
 		result = prime * result + (int) (temp ^ (temp >>> 32));
-		temp = Double.doubleToLongBits(longitude);
+		temp = Double.doubleToLongBits(this.getLongitude());
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
@@ -126,14 +126,14 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		SimpleGeospatialPoint other = (SimpleGeospatialPoint) obj;
+		if(!(obj instanceof GeospatialPoint))
+		    return false;
+		GeospatialPoint other = (GeospatialPoint) obj;
 		if (Double.doubleToLongBits(latitude) != Double
-				.doubleToLongBits(other.latitude))
+				.doubleToLongBits(other.getLatitude()))
 			return false;
 		if (Double.doubleToLongBits(longitude) != Double
-				.doubleToLongBits(other.longitude))
+				.doubleToLongBits(other.getLongitude()))
 			return false;
 		return true;
 	}
