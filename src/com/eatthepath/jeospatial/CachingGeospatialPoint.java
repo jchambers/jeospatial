@@ -10,7 +10,10 @@ package com.eatthepath.jeospatial;
  * to be made in repeated calls to the @{code getDistanceTo} method.</p>
  * 
  * <p>Caching geospatial points are a good choice in cases where one point will
- * be the origin in distance calculations to lots of other points.</p>
+ * be the origin in distance calculations to lots of other points. Caching
+ * points take up an additional 24 bytes of memory, and testing shows that
+ * distance calculations with caching points take 15%-20% less computation time
+ * than with non-caching points.</p>
  * 
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  */
