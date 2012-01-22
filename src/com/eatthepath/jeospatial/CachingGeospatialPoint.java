@@ -37,7 +37,7 @@ public class CachingGeospatialPoint extends SimpleGeospatialPoint {
 		this.setLongitude(longitude);
 	}
 	
-	    /**
+    /**
      * Constructs a new caching geospatial point at the location of the given
      * point.
      * 

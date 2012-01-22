@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
@@ -174,15 +173,16 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
                 T[] pointArray = this.points.toArray((T[])Array.newInstance(points.iterator().next().getClass(), 0));
                 
                 this.partition(pointArray, 0, pointArray.length);
+            } else {
+                throw new PartitionException("Cannot partition an empty node.");
             }
         }
         
         protected void partition(T[] points, int fromIndex, int toIndex) throws PartitionException {
-            // We start by choosing a center point at random and a distance
-            // threshold; the median distance from our center to points in our
-            // set is a safe bet.
-            Random r = new Random();
-            this.center = new CachingGeospatialPoint(points[r.nextInt(points.length)]);
+            // We start by choosing a center point and a distance threshold; the
+            // median distance from our center to points in our set is a safe
+            // bet.
+            this.center = new CachingGeospatialPoint(points[fromIndex]);
 
             // TODO Consider optimizing this
             java.util.Arrays.sort(points, fromIndex, toIndex,
@@ -236,6 +236,12 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             this.points = null;
         }
         
+        /**
+         * Indicates whether this is a leaf node.
+         * 
+         * @return @{code true} if this node is a leaf node or @{code false}
+         *         otherwise
+         */
         public boolean isLeafNode() {
             return this.closer == null;
         }
@@ -269,21 +275,31 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
                 // ...and now we're on our way back up. Decide if we need to search
                 // whichever child we didn't search on the way down.
                 if(searchedCloserFirst) {
-                    // We want to search the farther node if it's easier to get from
-                    // the query point to our threshold than it is to get to our own
-                    // center point.
+                    // We've already searched the node that contains points
+                    // within our threshold (which also implies that the query
+                    // point is inside our threshold); we also want to search
+                    // the node beyond our threshold if the distance from the
+                    // query point to the most distant match is longer than the
+                    // distance from the query point to our threshold, since
+                    // there could be a point outside our threshold that's
+                    // closer than the most distant match.
                     double distanceToThreshold = this.threshold - distanceToCenter;
                     
-                    if(distanceToThreshold < distanceToCenter) {
+                    if(results.getLongestDistanceFromQueryPoint() > distanceToThreshold) {
                         this.farther.getNearestNeighbors(queryPoint, results);
                     }
                 } else {
-                    // We want to search the closer node if any part of our region
-                    // is closer to the query point than the worst match in the
-                    // result set.
-                    double distanceToRegion = distanceToCenter - this.threshold;
+                    // We've already searched the node that contains points
+                    // beyond our threshold, and the query point itself is
+                    // beyond our threshold. We want to search the
+                    // within-threshold node if it's "easier" to get from the
+                    // query point to our region than it is to get from the
+                    // query point to the most distant match, since there could
+                    // be a point within our threshold that's closer than the
+                    // most distant match.
+                    double distanceToThreshold = distanceToCenter - this.threshold;
                     
-                    if(distanceToRegion <= results.getLongestDistanceFromQueryPoint()) {
+                    if(distanceToThreshold <= results.getLongestDistanceFromQueryPoint()) {
                         this.closer.getNearestNeighbors(queryPoint, results);
                     }
                 }

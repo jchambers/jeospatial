@@ -118,7 +118,7 @@ public class VPNodeTest {
         this.testNode.partition();
     }
     
-    @Test
+    @Test(expected = PartitionException.class)
     public void testPartitionEmpty() throws PartitionException {
         assertTrue(this.testNode.isLeafNode());
         assertTrue(this.testNode.isEmpty());
@@ -203,10 +203,6 @@ public class VPNodeTest {
         SearchResults<SimpleGeospatialPoint> results = new SearchResults<SimpleGeospatialPoint>(somerville, 3);
         this.testNode.getNearestNeighbors(somerville, results);
         List<SimpleGeospatialPoint> sortedResults = results.toSortedList();
-        
-        for(SimpleGeospatialPoint p : sortedResults) {
-            System.out.println(p);
-        }
         
         assertEquals(3, sortedResults.size());
         assertEquals(VPNodeTest.cities.get("Boston"), sortedResults.get(0));

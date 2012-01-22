@@ -80,13 +80,14 @@ public class SearchResults<E extends GeospatialPoint> extends PriorityQueue<E> {
             throw new IllegalArgumentException("Cannot addAll of a queue to itself.");
         }
         
-        boolean changed = false;
+        boolean anyChanged = false;
         
         for(E point : points) {
-            changed = changed || this.add(point);
+            boolean changed = this.add(point);
+            anyChanged = anyChanged || changed;
         }
         
-        return changed;
+        return anyChanged;
     }
     
     public double getLongestDistanceFromQueryPoint() {
