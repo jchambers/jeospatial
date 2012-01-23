@@ -22,6 +22,8 @@ public class TreeIterator<E extends GeospatialPoint> implements Iterator<E> {
         
         this.currentIterator = this.leafIterator.hasNext() ?
             this.leafIterator.next().getPoints().iterator() : null;
+        
+        this.findNextElement();
     }
     
     private void findNextElement() {
