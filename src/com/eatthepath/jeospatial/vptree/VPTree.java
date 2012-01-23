@@ -1,7 +1,9 @@
 package com.eatthepath.jeospatial.vptree;
 
 import java.lang.reflect.Array;
+import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -12,6 +14,7 @@ import com.eatthepath.jeospatial.CachingGeospatialPoint;
 import com.eatthepath.jeospatial.GeospatialPoint;
 import com.eatthepath.jeospatial.GeospatialPointDatabase;
 import com.eatthepath.jeospatial.SearchCriteria;
+import com.eatthepath.jeospatial.SimpleGeospatialPoint;
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
 import com.eatthepath.jeospatial.util.SearchResults;
 
@@ -76,6 +79,10 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         
         protected VPNode<T> getFartherNode() {
             return this.farther;
+        }
+        
+        protected GeospatialPoint getCenter() {
+            return this.center;
         }
         
         public boolean addAll(Collection<? extends T> points) {
@@ -161,6 +168,10 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             
             this.closer = null;
             this.farther = null;
+        }
+        
+        public Collection<T> getPoints() {
+            return new Vector<T>(this.points);
         }
         
         protected void partition() throws PartitionException {
@@ -336,6 +347,83 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
                 }
             }
         }
+        
+        protected void addPointsToArray(Object[] array) {
+            this.addPointsToArray(array, 0);
+        }
+        
+        protected int addPointsToArray(Object[] array, int offset) {
+            if(this.isLeafNode()) {
+                if(this.isEmpty()) { return 0; }
+                
+                System.arraycopy(this.points.toArray(), 0, array, offset, this.points.size());
+                
+                return this.points.size();
+            } else {
+                int nAddedFromCloser = this.closer.addPointsToArray(array, offset);
+                int nAddedFromFarther = this.farther.addPointsToArray(array, offset + nAddedFromCloser);
+                
+                return nAddedFromCloser + nAddedFromFarther;
+            }
+        }
+        
+        public void findNodeContainingPoint(GeospatialPoint p, Deque<VPNode<T>> stack) {
+            // First things first; add ourselves to the stack.
+            stack.push(this);
+            
+            // If this is a leaf node, we don't need to do anything else. If
+            // it's not a leaf node, recurse!
+            if(!this.isLeafNode()) {
+                if(this.center.getDistanceTo(p) <= this.threshold) {
+                    this.closer.findNodeContainingPoint(p, stack);
+                } else {
+                    this.farther.findNodeContainingPoint(p, stack);
+                }
+            }
+        }
+        
+        public void findNode(VPNode<T> node, Deque<VPNode<T>> stack) {
+            this.findNodeContainingPoint(node.getCenter(), stack);
+        }
+        
+        public boolean remove(T point) {
+            if(this.isLeafNode()) {
+                return this.points.remove(point);
+            } else {
+                throw new IllegalStateException("Cannot remove points from a non-leaf node.");
+            }
+        }
+        
+        public void absorbChildren() {
+            if(this.isLeafNode()) {
+                throw new IllegalStateException("Leaf nodes have no children.");
+            }
+            
+            this.points = new Vector<T>(this.binSize);
+            
+            if(!this.closer.isLeafNode()) {
+                this.closer.absorbChildren();
+            }
+            
+            if(!this.farther.isLeafNode()) {
+                this.farther.absorbChildren();
+            }
+            
+            this.points.addAll(this.closer.getPoints());
+            this.points.addAll(this.farther.getPoints());
+            
+            this.closer = null;
+            this.farther = null;
+        }
+        
+        public void gatherLeafNodes(List<VPNode<T>> leafNodes) {
+            if(this.isLeafNode()) {
+                leafNodes.add(this);
+            } else {
+                this.closer.gatherLeafNodes(leafNodes);
+                this.farther.gatherLeafNodes(leafNodes);
+            }
+        }
     }
     
     private static final int DEFAULT_BIN_SIZE = 32;
@@ -428,98 +516,212 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
 
     @Override
     public Iterator<E> iterator() {
-        // TODO Auto-generated method stub
-        return null;
+        return new TreeIterator<E>(this.root);
     }
 
     @Override
     public boolean remove(Object o) {
-        // TODO Auto-generated method stub
-        return false;
+        try {
+            @SuppressWarnings("unchecked")
+            E point = (E)o;
+            
+            return this.remove(point, false, null);
+        } catch(ClassCastException e) {
+            // The object we were given wasn't the kind of thing we're storing,
+            // so we definitely can't remove it.
+            return false;
+        }
     }
-
+    
+    protected boolean remove(E point, boolean deferPruning, Set<VPNode<E>> nodesToPrune) {
+        ArrayDeque<VPNode<E>> stack = new ArrayDeque<VPNode<E>>();
+        this.root.findNodeContainingPoint(point, stack);
+        
+        VPNode<E> node = stack.pop();
+        
+        boolean pointRemoved = node.remove(point);
+        
+        if(node.isEmpty()) {
+            if(deferPruning) {
+                nodesToPrune.add(node);
+            } else {
+                this.pruneEmptyNode(node);
+            }
+        }
+        
+        return pointRemoved;
+    }
+    
     @Override
     public boolean removeAll(Collection<?> c) {
-        // TODO Auto-generated method stub
-        return false;
+        boolean anyChanged = false;
+        HashSet<VPNode<E>> nodesToPrune = new HashSet<VPNode<E>>();
+        
+        for(Object o : c) {
+            try {
+                @SuppressWarnings("unchecked")
+                E point = (E)o;
+                
+                boolean pointRemoved = this.remove(point, true, nodesToPrune);
+                anyChanged = anyChanged || pointRemoved;
+            } catch(ClassCastException e) {
+                // The object wasn't the kind of point we have in this tree;
+                // just keep moving.
+            }
+        }
+        
+        for(VPNode<E> node : nodesToPrune) {
+            // There's an edge case here where both children of a node will be
+            // in the pruning set; it's harmless (if inefficient) to try to
+            // find/prune a node that's already been pruned, so we don't go too
+            // far out of our way to avoid that case.
+            this.pruneEmptyNode(node);
+        }
+        
+        return anyChanged;
+    }
+
+    protected void pruneEmptyNode(VPNode<E> node) {
+        // Only spend time working on this if the node is actually empty; it's
+        // harmless to call this method on a non-empty node, though.
+        if(node.isEmpty()) {
+            ArrayDeque<VPNode<E>> stack = new ArrayDeque<VPNode<E>>();
+            this.root.findNode(node, stack);
+            
+            // Immediately pop the first node off the stack (since we know it's
+            // the empty leaf node we were handed as an argument).
+            stack.pop();
+            
+            // Work through the stack until we either have a non-empty parent or
+            // we hit the root of the tree.
+            while(stack.peek() != null) {
+                VPNode<E> parent = stack.pop();
+                parent.absorbChildren();
+                
+                // We're done as soon as we have a non-empty parent.
+                if(!parent.isEmpty()) { break; }
+            }
+        }
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        // TODO Auto-generated method stub
-        return false;
+        throw new UnsupportedOperationException("VP-trees do not support the optional retainAll method.");
     }
 
     @Override
     public int size() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.root.size();
     }
 
     @Override
     public Object[] toArray() {
-        // TODO Auto-generated method stub
-        return null;
+        Object[] array = new Object[this.size()];
+        this.root.addPointsToArray(array);
+        
+        return array;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T[] toArray(T[] a) {
-        // TODO Auto-generated method stub
-        return null;
+        int size = this.size();
+        
+        if(a.length < this.size()) {
+            return (T[])java.util.Arrays.copyOf(this.toArray(), size, a.getClass());
+        } else {
+            System.arraycopy(this.toArray(), 0, a, 0, size);
+            
+            if(a.length > size) { a[size] = null; }
+            
+            return a;
+        }
     }
 
     @Override
-    public List<E> getNearestNeighbors(GeospatialPoint queryPoint,
-            int maxResults) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<E> getNearestNeighbors(GeospatialPoint queryPoint, int maxResults) {
+        SearchResults<E> results = new SearchResults<E>(queryPoint, maxResults);
+        this.root.getNearestNeighbors(queryPoint, results);
+        
+        return results.toSortedList();
     }
 
     @Override
-    public List<E> getNearestNeighbors(GeospatialPoint queryPoint,
-            int maxResults, double maxDistance) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<E> getNearestNeighbors(GeospatialPoint queryPoint, int maxResults, double maxDistance) {
+        SearchResults<E> results = new SearchResults<E>(queryPoint, maxResults, maxDistance);
+        this.root.getNearestNeighbors(queryPoint, results);
+        
+        return results.toSortedList();
     }
 
     @Override
-    public List<E> getNearestNeighbors(GeospatialPoint queryPoint,
-            int maxResults, SearchCriteria<E> searchCriteria) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<E> getNearestNeighbors(GeospatialPoint queryPoint, int maxResults, SearchCriteria<E> searchCriteria) {
+        SearchResults<E> results = new SearchResults<E>(queryPoint, maxResults, searchCriteria);
+        this.root.getNearestNeighbors(queryPoint, results);
+        
+        return results.toSortedList();
     }
 
     @Override
-    public List<E> getNearestNeighbors(GeospatialPoint queryPoint,
-            int maxResults, double maxDistance, SearchCriteria<E> searchCriteria) {
-        // TODO Auto-generated method stub
-        return null;
+    public List<E> getNearestNeighbors(GeospatialPoint queryPoint, int maxResults, double maxDistance, SearchCriteria<E> searchCriteria) {
+        SearchResults<E> results = new SearchResults<E>(queryPoint, maxResults, maxDistance, searchCriteria);
+        this.root.getNearestNeighbors(queryPoint, results);
+        
+        return results.toSortedList();
     }
 
     @Override
-    public List<E> getAllNeighborsWithinDistance(GeospatialPoint queryPoint,
-            double maxDistance) {
+    public List<E> getAllNeighborsWithinDistance(GeospatialPoint queryPoint, double maxDistance) {
         return this.getAllNeighborsWithinDistance(queryPoint, maxDistance, null);
     }
 
     @Override
-    public List<E> getAllNeighborsWithinDistance(GeospatialPoint queryPoint,
-            double maxDistance, SearchCriteria<E> searchCriteria) {
+    public List<E> getAllNeighborsWithinDistance(GeospatialPoint queryPoint, double maxDistance, SearchCriteria<E> searchCriteria) {
         Vector<E> results = new Vector<E>(this.binSize);
         this.root.getAllWithinRange(new CachingGeospatialPoint(queryPoint), maxDistance, searchCriteria, results);
         
         java.util.Collections.sort(results, new GeospatialDistanceComparator<E>(queryPoint));
+        
         return results;
     }
 
     @Override
     public void movePoint(E point, double latitude, double longitude) {
-        // TODO Auto-generated method stub
-        
+        this.movePoint(point, new SimpleGeospatialPoint(latitude, longitude));
     }
 
     @Override
     public void movePoint(E point, GeospatialPoint destination) {
-        this.movePoint(point, destination.getLatitude(), destination.getLongitude());
+        // Moving points can trigger significant structural changes to a
+        // tree. If a point's departure from a node would leave that node
+        // empty, its parent needs to gather the nodes from its children and
+        // potentially repartition itself. If the point's arrival in a node
+        // would push that node over the bin size threshold, the node might
+        // need to be partitioned. We want to avoid the case where we'd move
+        // the point out of a node, regroup things in the parent, and then
+        // put the node right back in the same place, so we do some work in
+        // advance to see if the old and new positions would fall into the
+        // same tree node.
+        ArrayDeque<VPNode<E>> sourcePath = new ArrayDeque<VPNode<E>>();
+        ArrayDeque<VPNode<E>> destinationPath = new ArrayDeque<VPNode<E>>();
+        
+        this.root.findNodeContainingPoint(point, sourcePath);
+        this.root.findNodeContainingPoint(destination, destinationPath);
+        
+        if(sourcePath.equals(destinationPath)) {
+            // Easy! We expect no structural changes, so we can modify the
+            // point directly and immediately.
+            point.setLatitude(destination.getLatitude());
+            point.setLongitude(destination.getLongitude());
+        } else {
+            // We don't know that moving the point will cause structural
+            // changes, but we have to assume it will.
+            this.remove(point);
+            
+            point.setLatitude(destination.getLatitude());
+            point.setLongitude(destination.getLongitude());
+            
+            this.add(point);
+        }
     }
 }

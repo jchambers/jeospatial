@@ -260,4 +260,26 @@ public class VPNodeTest {
         assertEquals(1, results.size());
         assertTrue(results.contains(VPNodeTest.cities.get("Boston")));
     }
+    
+    @Test
+    public void testAddPointsToArray() {
+        SimpleGeospatialPoint[] points = new SimpleGeospatialPoint[VPNodeTest.cities.size()];
+        
+        this.testNode.addAll(VPNodeTest.cities.values());
+        this.testNode.addPointsToArray(points, 0);
+        
+        for(int i = 0; i < points.length; i++) {
+            assertNotNull(points[i]);
+        }
+        
+        Vector<SimpleGeospatialPoint> pointList = new Vector<SimpleGeospatialPoint>(points.length);
+        
+        for(int i = 0; i < points.length; i++) {
+            pointList.add(points[i]);
+        }
+        
+        for(SimpleGeospatialPoint p : VPNodeTest.cities.values()) {
+            assertTrue(pointList.contains(p));
+        }
+    }
 }
