@@ -47,6 +47,11 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         private Vector<T> points;
         private final int binSize;
         
+        /**
+         * Constructs a new, empty node with the given capacity.
+         * 
+         * @param binSize the largest number of points this node should hold
+         */
         public VPNode(int binSize) {
             this.binSize = binSize;
             this.points = new Vector<T>(this.binSize);
@@ -54,6 +59,22 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             this.center = null;
         }
         
+        /**
+         * Constructs a new node that contains a subset of the given array of
+         * points. If the subset of points is larger than the given bin
+         * capacity, child nodes will be created recursively.
+         * 
+         * @param points
+         *            the array of points from which to build this node
+         * @param fromIndex
+         *            the starting index (inclusive) of the subset of the array
+         *            from which to build this node
+         * @param toIndex
+         *            the end index (exclusive) of the subset of the array from
+         *            which to build this node
+         * @param binSize
+         *            the largest number of points this node should hold
+         */
         public VPNode(T[] points, int fromIndex, int toIndex, int binSize) {
             this.binSize = binSize;
             
@@ -73,18 +94,58 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             }
         }
         
+        /**
+         * Returns a reference to this node's child that contains points that
+         * are closer to this node's center than this node's distance threshold.
+         * 
+         * @return a reference to this node's "closer" child, or {@code null} if
+         *         this is a leaf node
+         * 
+         * @see VPNode#isLeafNode()
+         */
         protected VPNode<T> getCloserNode() {
             return this.closer;
         }
         
+        /**
+         * Returns a reference to this node's child that contains points that
+         * are farther away from this node's center than this node's distance
+         * threshold.
+         * 
+         * @return a reference to this node's "farther" child, or {@code null}
+         *         if this is a leaf node
+         * 
+         * @see VPNode#isLeafNode()
+         */
         protected VPNode<T> getFartherNode() {
             return this.farther;
         }
         
+        /**
+         * Returns a point that is coincident with this node's center point.
+         * 
+         * @return a point that is coincident with this node's center point
+         */
         protected GeospatialPoint getCenter() {
-            return this.center;
+            return new SimpleGeospatialPoint(this.center);
         }
         
+        /**
+         * <p>Adds all of the points in a collection to this node (if it is a
+         * leaf node) or its children. If this node is a leaf node and the added
+         * points push this node beyond its capacity, it is partitioned as
+         * needed after all points have been added.</p>
+         * 
+         * <p>This method defers partitioning of child nodes until all points
+         * have been added.</p>
+         * 
+         * @param points
+         *            the collection of points to add to this node or its
+         *            children
+         * 
+         * @return {@code true} if this node or its children were modified or
+         *         {@code false} otherwise
+         */
         public boolean addAll(Collection<? extends T> points) {
             HashSet<VPNode<T>> nodesToPartition = new HashSet<VPNode<T>>();
             
@@ -107,10 +168,47 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             return !points.isEmpty();
         }
         
+        /**
+         * Adds a point to this node if it is a leaf node or one of its children
+         * if not. If the node that ultimately holds the new point is loaded
+         * beyond its capacity, it will be partitioned.
+         * 
+         * @param point
+         *            the point to add to this node or one of its children
+         * 
+         * @return {@code true} if this node or one of its children was modified
+         *         by the addition of this point or {@code false} otherwise
+         */
         public boolean add(T point) {
             return this.add(point, false, null);
         }
         
+        /**
+         * <p>Adds a point to this node if it is a leaf node or one of its
+         * children if not. If the node that ultimately holds the new point is
+         * loaded beyond its capacity, it will be partitioned.</p>
+         * 
+         * <p>Partitioning may optionally be deferred, in which case it is the
+         * responsibility of the caller to partition overloaded nodes.</p>
+         * 
+         * @param point
+         *            the point to add to this node or one of its children
+         * @param deferPartitioning
+         *            if {@code true}, defer partitioning of overloaded nodes
+         *            until the caller chooses to partition them; if
+         *            {@code false}, overloaded nodes are partitioned
+         *            immediately
+         * @param nodesToPartition
+         *            a {@code Set} that collects overloaded nodes in need of
+         *            deferred partitioning; this may be {@code null} if
+         *            {@code deferPartitioning} is {@code false}; callers must
+         *            use this set to partition nodes later
+         * 
+         * @return {@code true} if this node or any of its children were
+         *         modified by the addition of the new point or {@code false}
+         *         otherwise; note that adding points always results in
+         *         modification
+         */
         protected boolean add(T point, boolean deferPartitioning, Set<VPNode<T>> nodesToPartition) {
             if(this.isLeafNode()) {
                 this.points.add(point);
@@ -136,9 +234,20 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
                 }
             }
             
+            // There's no way to add a point and not modify the tree.
             return true;
         }
         
+        /**
+         * Tests whether this node or one of its children contains the given
+         * point.
+         * 
+         * @param point
+         *            the point whose presence is to be tested
+         * 
+         * @return {@code true} if the given point is present in this node or
+         *         one of its children or {@code false} otherwise
+         */
         public boolean contains(T point) {
             if(this.isLeafNode()) {
                 return this.points.contains(point);
@@ -151,6 +260,12 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             }
         }
         
+        /**
+         * Returns the number of points contained in this node and its child
+         * nodes.
+         * 
+         * @return the number of points in this node and its children
+         */
         public int size() {
             if(this.isLeafNode()) {
                 return this.points.size();
@@ -159,6 +274,19 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             }
         }
         
+        /**
+         * Stores a subset of an array of points in this node directly, making
+         * this node a leaf node.
+         * 
+         * @param points
+         *            the array of points from which to store a subset
+         * @param fromIndex
+         *            the starting index (inclusive) of the subset of the array
+         *            to store
+         * @param toIndex
+         *            the end index (exclusive) of the subset of the array to
+         *            store
+         */
         private void storePoints(T[] points, int fromIndex, int toIndex) {
             this.points = new Vector<T>(this.binSize);
             
@@ -170,7 +298,17 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             this.farther = null;
         }
         
+        /**
+         * Returns a collection of all the points stored directly in this node.
+         * 
+         * @return a collection of all the points stored directly in this node
+         * 
+         * @throws IllegalStateException if this node is not a leaf node
+         */
         public Collection<T> getPoints() {
+            if(!this.isLeafNode()) {
+                throw new IllegalStateException("Cannot retrieve points from a non-leaf node.");
+            }
             return new Vector<T>(this.points);
         }
         
@@ -248,15 +386,21 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         }
         
         /**
-         * Indicates whether this is a leaf node.
+         * Tests whether this is a leaf node.
          * 
-         * @return @{code true} if this node is a leaf node or @{code false}
+         * @return {@code true} if this node is a leaf node or {@code false}
          *         otherwise
          */
         public boolean isLeafNode() {
             return this.closer == null;
         }
         
+        /**
+         * Tests whether this node and all of its children are empty.
+         * 
+         * @return {@code true} if this node and all of its children contain no
+         *         points or {@code false} otherwise
+         */
         public boolean isEmpty() {
             if(this.isLeafNode()) {
                 return this.points.isEmpty();
