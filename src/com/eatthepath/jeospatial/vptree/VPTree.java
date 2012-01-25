@@ -130,6 +130,10 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             return new SimpleGeospatialPoint(this.center);
         }
         
+        protected double getThreshold() {
+            return this.threshold;
+        }
+        
         /**
          * <p>Adds all of the points in a collection to this node (if it is a
          * leaf node) or its children. If this node is a leaf node and the added
@@ -328,6 +332,11 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         }
         
         protected void partition(T[] points, int fromIndex, int toIndex) throws PartitionException {
+            // We can't partition fewer then two points.
+            if(toIndex - fromIndex < 2) {
+                throw new PartitionException("Cannot partition fewer than two points.");
+            }
+            
             // We start by choosing a center point and a distance threshold; the
             // median distance from our center to points in our set is a safe
             // bet.
@@ -342,13 +351,17 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             
             // Since we're picking a definite median value from the list, we're
             // guaranteed to have at least one point that is closer to or EQUAL TO
-            // (via identity) the threshold; what we want to do now is find the
-            // first point that's farther away and use that as our partitioning
-            // point.
+            // (via identity) the threshold; what we want to do now is make sure
+            // there's at least one point that's farther away from the center
+            // than the threshold.
             int partitionIndex = -1;
             
             for(int i = medianIndex + 1; i < toIndex; i++) {
                 if(this.center.getDistanceTo(points[i]) > medianDistance) {
+                    // We found at least one point farther away than the median
+                    // distance. That means we can use the median as our
+                    // distance threshold and everything after that point in the
+                    // sorted array as members of the "farther" node.
                     partitionIndex = i;
                     this.threshold = medianDistance;
                     
@@ -356,16 +369,38 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
                 }
             }
             
-            // Did we find a point that's farther away than the median distance? If
-            // so, great! If not, move the threshold closer in and see if we can
-            // find a distance that partitions our point set.
+            // Did we find a point that's farther away than the median distance?
+            // If so, great!
+            //
+            // If not, we know that all points after the median point in the
+            // sorted array have the same distance from the center, and we need
+            // to try to move the threshold back until we find a point that's
+            // less distant than the median distance. If we find such a point,
+            // we'll use its distance from the center as our distance threshold.
+            // If the median distance is zero, though, and we've made it this
+            // far, we know there's nothing MORE distant than that and shouldn't
+            // spend time searching.
             if(partitionIndex == -1) {
-                for(int i = medianIndex; i > fromIndex; i--) {
-                    if(this.center.getDistanceTo(points[i]) < medianDistance) {
-                        partitionIndex = i;
-                        this.threshold = this.center.getDistanceTo(points[i]);
-                        
-                        break;
+                if(medianDistance != 0) {
+                    for(int i = medianIndex; i > fromIndex; i--) {
+                        if(this.center.getDistanceTo(points[i]) < medianDistance) {
+                            partitionIndex = i;
+                            this.threshold = this.center.getDistanceTo(points[i]);
+                            
+                            break;
+                        }
+                    }
+                    
+                    // Did we still fail to find anything? There's still one
+                    // special case that can save us. If we've made it here, we
+                    // know that everything except the center point has the same
+                    // non-zero distance from the center. We can and should
+                    // still partition by putting the center alone in the
+                    // "closer" node and everything else in the "farther" node.
+                    // This, of course, assumes there's more than one point to
+                    // work with.
+                    if(partitionIndex == -1) {
+                        partitionIndex = fromIndex + 1;
                     }
                 }
             }

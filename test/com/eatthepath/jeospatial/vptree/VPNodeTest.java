@@ -126,6 +126,16 @@ public class VPNodeTest {
         this.testNode.partition();
     }
     
+    @Test(expected = PartitionException.class)
+    public void testPartitionSinglePoint() throws PartitionException {
+        assertTrue(this.testNode.isLeafNode());
+        assertTrue(this.testNode.isEmpty());
+        
+        this.testNode.add(VPNodeTest.cities.get("Boston"));
+        
+        this.testNode.partition();
+    }
+    
     @Test
     public void testPartition() throws PartitionException {
         assertTrue(this.testNode.isLeafNode());
@@ -173,6 +183,56 @@ public class VPNodeTest {
         assertFalse(this.testNode.contains(VPNodeTest.cities.get("Boston")));
         assertTrue(this.testNode.contains(VPNodeTest.cities.get("New York")));
         assertEquals(5, this.testNode.size());
+    }
+    
+    @Test(expected = PartitionException.class)
+    public void testPartitionIdenticalPoints() throws PartitionException {
+        SimpleGeospatialPoint[] points = new SimpleGeospatialPoint[] {
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("Boston")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("Boston")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("Boston")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("Boston")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("Boston")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("Boston"))
+        };
+        
+        this.testNode.partition(points, 0, 6);
+    }
+    
+    @Test
+    public void testPartitionThresholdAfterMedian() throws PartitionException {
+        SimpleGeospatialPoint[] points = new SimpleGeospatialPoint[] {
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("Boston")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("Boston")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("Boston")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("Boston")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("Boston")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("New York"))
+        };
+        
+        this.testNode.partition(points, 0, 6);
+        
+        assertFalse(this.testNode.isLeafNode());
+        assertFalse(this.testNode.getCloserNode().isEmpty());
+        assertFalse(this.testNode.getFartherNode().isEmpty());
+    }
+    
+    @Test
+    public void testPartitionThresholdBeforeMedian() throws PartitionException {
+        SimpleGeospatialPoint[] points = new SimpleGeospatialPoint[] {
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("Boston")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("New York")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("New York")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("New York")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("New York")),
+            new SimpleGeospatialPoint(VPNodeTest.cities.get("New York"))
+        };
+        
+        this.testNode.partition(points, 0, 6);
+        
+        assertFalse(this.testNode.isLeafNode());
+        assertFalse(this.testNode.getCloserNode().isEmpty());
+        assertFalse(this.testNode.getFartherNode().isEmpty());
     }
     
     @Test
