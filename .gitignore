@@ -3,3 +3,6 @@
 .settings
 bin
 *.jar
+build
+build-test
+doc/javadoc
