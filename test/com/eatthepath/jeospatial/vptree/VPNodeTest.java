@@ -14,6 +14,7 @@ import org.junit.Test;
 import com.eatthepath.jeospatial.CachingGeospatialPoint;
 import com.eatthepath.jeospatial.SearchCriteria;
 import com.eatthepath.jeospatial.SimpleGeospatialPoint;
+import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
 import com.eatthepath.jeospatial.util.SearchResults;
 
 public class VPNodeTest {
@@ -264,19 +265,21 @@ public class VPNodeTest {
         this.testNode.getNearestNeighbors(somerville, results);
         List<SimpleGeospatialPoint> sortedResults = results.toSortedList();
         
+        Vector<SimpleGeospatialPoint> expectedResults =
+                new Vector<SimpleGeospatialPoint>(VPNodeTest.cities.values());
+        
+        java.util.Collections.sort(expectedResults,
+                new GeospatialDistanceComparator<SimpleGeospatialPoint>(somerville));
+        
         assertEquals(3, sortedResults.size());
-        assertEquals(VPNodeTest.cities.get("Boston"), sortedResults.get(0));
-        assertEquals(VPNodeTest.cities.get("New York"), sortedResults.get(1));
-        assertEquals(VPNodeTest.cities.get("Detroit"), sortedResults.get(2));
+        assertEquals(expectedResults.subList(0, 3), sortedResults);
         
         results = new SearchResults<SimpleGeospatialPoint>(somerville, 8, 1000 * 1000);
         this.testNode.getNearestNeighbors(somerville, results);
         sortedResults = results.toSortedList();
         
         assertEquals(3, sortedResults.size());
-        assertEquals(VPNodeTest.cities.get("Boston"), sortedResults.get(0));
-        assertEquals(VPNodeTest.cities.get("New York"), sortedResults.get(1));
-        assertEquals(VPNodeTest.cities.get("Detroit"), sortedResults.get(2));
+        assertEquals(expectedResults.subList(0, 3), sortedResults);
         
         SearchCriteria<SimpleGeospatialPoint> criteria = new SearchCriteria<SimpleGeospatialPoint>() {
             @Override
@@ -291,6 +294,12 @@ public class VPNodeTest {
         
         assertEquals(1, sortedResults.size());
         assertEquals(VPNodeTest.cities.get("Boston"), sortedResults.get(0));
+        
+        results = new SearchResults<SimpleGeospatialPoint>(somerville, VPNodeTest.cities.size());
+        this.testNode.getNearestNeighbors(somerville, results);
+        sortedResults = results.toSortedList();
+        
+        assertEquals(expectedResults, sortedResults);
     }
     
     @Test
@@ -301,6 +310,12 @@ public class VPNodeTest {
         
         Vector<SimpleGeospatialPoint> results = new Vector<SimpleGeospatialPoint>();
         this.testNode.getAllWithinRange(somerville, 1000 * 1000, null, results);
+        
+        Vector<SimpleGeospatialPoint> expectedResults =
+                new Vector<SimpleGeospatialPoint>(VPNodeTest.cities.values());
+        
+        java.util.Collections.sort(expectedResults,
+                new GeospatialDistanceComparator<SimpleGeospatialPoint>(somerville));
         
         assertEquals(3, results.size());
         assertTrue(results.contains(VPNodeTest.cities.get("Boston")));
