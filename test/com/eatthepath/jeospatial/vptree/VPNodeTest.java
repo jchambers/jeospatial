@@ -2,6 +2,7 @@ package com.eatthepath.jeospatial.vptree;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
@@ -101,13 +102,38 @@ public class VPNodeTest {
     }
     
     @Test
+    public void testSize() {
+        this.testNode.addAll(VPNodeTest.cities.values());
+        assertEquals(VPNodeTest.cities.size(), this.testNode.size());
+    }
+    
+    @Test
     public void testContains() {
-        assertTrue(this.testNode.isEmpty());
         assertFalse(this.testNode.contains(VPNodeTest.cities.get("Boston")));
+        this.testNode.addAll(VPNodeTest.cities.values());
+        assertTrue(this.testNode.contains(VPNodeTest.cities.get("Boston")));
+    }
+    
+    @Test
+    public void testGetPoints() {
+        assertTrue(this.testNode.isLeafNode());
+        assertNotNull(this.testNode.getPoints());
+        assertTrue(this.testNode.getPoints().isEmpty());
         
+        this.testNode.add(VPNodeTest.cities.get("Boston"));
+        
+        assertTrue(this.testNode.isLeafNode());
+        assertNotNull(this.testNode.getPoints());
+        assertFalse(this.testNode.getPoints().isEmpty());
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void testGetPointsNonLeafNode() {
         this.testNode.addAll(VPNodeTest.cities.values());
         
-        assertTrue(this.testNode.contains(VPNodeTest.cities.get("Boston")));
+        assertFalse(this.testNode.isLeafNode());
+        
+        this.testNode.getPoints();
     }
     
     @Test(expected = PartitionException.class)
@@ -355,6 +381,87 @@ public class VPNodeTest {
         
         for(SimpleGeospatialPoint p : VPNodeTest.cities.values()) {
             assertTrue(pointList.contains(p));
+        }
+    }
+    
+    @Test
+    public void testFindNodeContainingPoint() {
+        this.testNode.addAll(VPNodeTest.cities.values());
+        
+        ArrayDeque<VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint>> stack =
+                new ArrayDeque<VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint>>();
+        
+        SimpleGeospatialPoint memphis = VPNodeTest.cities.get("Memphis");
+        
+        this.testNode.findNodeContainingPoint(memphis, stack);
+        
+        assertTrue(stack.peek().contains(memphis));
+    }
+    
+    @Test
+    public void testRemove() {
+        this.testNode.add(VPNodeTest.cities.get("Boston"));
+        
+        assertFalse(this.testNode.isEmpty());
+        assertTrue(this.testNode.isLeafNode());
+        
+        assertTrue(this.testNode.remove(VPNodeTest.cities.get("Boston")));
+        
+        assertTrue(this.testNode.isEmpty());
+        assertTrue(this.testNode.isLeafNode());
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void testRemoveNonLeafNode() {
+        this.testNode.addAll(VPNodeTest.cities.values());
+        
+        assertFalse(this.testNode.isLeafNode());
+        
+        this.testNode.remove(VPNodeTest.cities.get("Boston"));
+    }
+    
+    @Test
+    public void testAbsorbChildren() {
+        this.testNode.addAll(VPNodeTest.cities.values());
+        
+        assertFalse(this.testNode.isLeafNode());
+        
+        this.testNode.absorbChildren();
+        
+        assertTrue(this.testNode.isLeafNode());
+        assertEquals(VPNodeTest.cities.size(), this.testNode.getPoints().size());
+    }
+    
+    @Test(expected = IllegalStateException.class)
+    public void testAbsorbChildrenNonLeafNode() {
+        assertTrue(this.testNode.isLeafNode());
+        this.testNode.absorbChildren();
+    }
+    
+    @Test
+    public void testGatherLeafNodes() {
+        Vector<VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint>> nodes =
+                new Vector<VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint>>();
+        
+        assertTrue(this.testNode.isLeafNode());
+        
+        this.testNode.gatherLeafNodes(nodes);
+        
+        assertEquals(1, nodes.size());
+        assertTrue(nodes.contains(this.testNode));
+        
+        nodes = new Vector<VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint>>();
+        
+        this.testNode.addAll(VPNodeTest.cities.values());
+        
+        assertFalse(this.testNode.isLeafNode());
+        
+        this.testNode.gatherLeafNodes(nodes);
+        
+        assertFalse(nodes.contains(this.testNode));
+        
+        for(VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint> node : nodes) {
+            assertTrue(node.isLeafNode());
         }
     }
 }
