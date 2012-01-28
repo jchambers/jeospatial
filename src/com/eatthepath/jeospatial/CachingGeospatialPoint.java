@@ -18,8 +18,6 @@ package com.eatthepath.jeospatial;
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  */
 public class CachingGeospatialPoint extends SimpleGeospatialPoint {
-	private static final double EARTH_RADIUS = 6371000; // meters
-	
 	private double lon1;
 	private double sinLat1;
 	private double cosLat1;
@@ -89,7 +87,7 @@ public class CachingGeospatialPoint extends SimpleGeospatialPoint {
 		double angle = Math.acos((this.sinLat1 * Math.sin(lat2)) +
 				(this.cosLat1 * Math.cos(lat2) * Math.cos(lon2 - this.lon1)));
 		
-		return Double.isNaN(angle) ? 0 : EARTH_RADIUS * angle;
+		return Double.isNaN(angle) ? 0 : GeospatialPoint.EARTH_RADIUS * angle;
 	}
 
 }

@@ -2,16 +2,13 @@ package com.eatthepath.jeospatial;
 
 /**
  * <p>A simple geospatial point implementation. Simple geospatial points
- * calculate distance to other points using the spherical law of cosines and
- * assume that the earth is spherical and has a radius of 6,371,000 meters.</p>
+ * calculate distance to other points using the spherical law of cosines.</p>
  * 
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  */
 public class SimpleGeospatialPoint implements GeospatialPoint {
 	private double latitude;
 	private double longitude;
-	
-	private static final double EARTH_RADIUS = 6371000; // meters
 	
 	/**
 	 * Constructs a new geospatial point at the given latitude and longitude
@@ -90,7 +87,7 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 		
 		double angle = Math.acos((Math.sin(lat1) * Math.sin(lat2)) + (Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1)));
 		
-		return Double.isNaN(angle) ? 0 : EARTH_RADIUS * angle;
+		return Double.isNaN(angle) ? 0 : GeospatialPoint.EARTH_RADIUS * angle;
 	}
 
 	/* (non-Javadoc)
