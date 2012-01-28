@@ -298,6 +298,11 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
                 this.points.add(points[i]);
             }
             
+            // Always choose a center point if we don't already have one
+            if(this.center == null && !this.points.isEmpty()) {
+                this.center = new CachingGeospatialPoint(this.points.get(0));
+            }
+            
             this.closer = null;
             this.farther = null;
         }
@@ -340,7 +345,9 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             // We start by choosing a center point and a distance threshold; the
             // median distance from our center to points in our set is a safe
             // bet.
-            this.center = new CachingGeospatialPoint(points[fromIndex]);
+            if(this.center == null) {
+                this.center = new CachingGeospatialPoint(points[fromIndex]);
+            }
 
             // TODO Consider optimizing this
             java.util.Arrays.sort(points, fromIndex, toIndex,
@@ -442,6 +449,14 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             } else {
                 return (this.closer.isEmpty() && this.farther.isEmpty());
             }
+        }
+        
+        public boolean isOverloaded() {
+            if(!this.isLeafNode()) {
+                throw new IllegalStateException("Non-leaf nodes cannot be overloaded.");
+            }
+            
+            return this.points.size() > this.binSize;
         }
 
         protected void getNearestNeighbors(final GeospatialPoint queryPoint, final SearchResults<T> results) {
@@ -599,6 +614,19 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
                 this.farther.gatherLeafNodes(leafNodes);
             }
         }
+        
+        public boolean isAncestorOfNode(VPNode<T> node) {
+            // Obviously, leaf nodes can't be the ancestors of anything
+            if(this.isLeafNode()) { return false; }
+            
+            // Find a path to the center of the node we've been given
+            ArrayDeque<VPNode<T>> stack = new ArrayDeque<VPNode<T>>();
+            this.findNodeContainingPoint(node.getCenter(), stack);
+            
+            // We're an ancestor if we appear anywhere in the path to the given
+            // node
+            return stack.contains(this);
+        }
     }
     
     private static final int DEFAULT_BIN_SIZE = 32;
@@ -621,6 +649,10 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
      *            tree
      */
     public VPTree(int nodeCapacity) {
+        if(nodeCapacity < 1) {
+            throw new IllegalArgumentException("Node capacity must be greater than zero.");
+        }
+        
         this.binSize = nodeCapacity;
         this.root = new VPNode<E>(this.binSize);
     }
@@ -648,6 +680,10 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
      *            contain
      */
     public VPTree(Collection<E> points, int nodeCapacity) {
+        if(nodeCapacity < 1) {
+            throw new IllegalArgumentException("Node capacity must be greater than zero.");
+        }
+        
         this.binSize = nodeCapacity;
         
         if(!points.isEmpty()) {
@@ -658,6 +694,26 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         } else {
             this.root = new VPNode<E>(this.binSize);
         }
+    }
+    
+    /**
+     * Returns a reference to this tree's root node. This method is intended for
+     * testing purposes only.
+     * 
+     * @return a reference to this tree's root node
+     */
+    protected VPNode<E> getRoot() {
+        return this.root;
+    }
+    
+    /**
+     * Returns the maximum number of points any leaf node of this tree should
+     * contain.
+     * 
+     * @return the maximum number of points any leaf node should contain
+     */
+    public int getBinSize() {
+        return this.binSize;
     }
     
     /**
@@ -859,21 +915,43 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             }
         }
         
+        // Avoid duplicating work by removing pruning targets that are children
+        // of other pruning targets (since they would be implicitly pruned by
+        // pruning the parent).
+        HashSet<VPNode<E>> nodesToNotPrune = new HashSet<VPNode<E>>();
+        
         for(VPNode<E> node : nodesToPrune) {
-            // There's an edge case here where both children of a node will be
-            // in the pruning set; it's harmless (if inefficient) to try to
-            // find/prune a node that's already been pruned, so we don't go too
-            // far out of our way to avoid that case.
+            for(VPNode<E> potentialAncestor : nodesToPrune) {
+                if(potentialAncestor.isAncestorOfNode(node)) {
+                    nodesToNotPrune.add(node);
+                }
+            }
+        }
+        
+        nodesToPrune.removeAll(nodesToNotPrune);
+        
+        // Now the set of nodes to prune contains only the highest nodes in any
+        // branch; prune (and potentially repartition) each of those
+        // individually.
+        for(VPNode<E> node : nodesToPrune) {
             this.pruneEmptyNode(node);
+            
+            if(node.isOverloaded()) {
+                try {
+                    node.partition();
+                } catch(PartitionException e) {
+                    // These things happen.
+                }
+            }
         }
         
         return anyChanged;
     }
-
+    
     protected void pruneEmptyNode(VPNode<E> node) {
         // Only spend time working on this if the node is actually empty; it's
         // harmless to call this method on a non-empty node, though.
-        if(node.isEmpty()) {
+        if(node.isEmpty() && node != this.root) {
             ArrayDeque<VPNode<E>> stack = new ArrayDeque<VPNode<E>>();
             this.root.findNodeContainingPoint(node.getCenter(), stack);
             
@@ -886,8 +964,6 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             while(stack.peek() != null) {
                 VPNode<E> parent = stack.pop();
                 parent.absorbChildren();
-                
-                // TODO Partition over-full nodes
                 
                 // We're done as soon as we have a non-empty parent.
                 if(!parent.isEmpty()) { break; }
