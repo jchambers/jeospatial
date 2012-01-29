@@ -4,6 +4,14 @@ Jeospatial is a simple geospatial point database library for Java. It aims to pr
 
 Geospatial point databases in this library are implemented using [vantage point trees](http://pnylab.com/pny/papers/vptree/main.html) (or vp-trees), which are a data structure that performs binary space partitioning on a metric space. Construction of a geospatial point database executes in _O(n log(n))_ time and searches against that database execute in _O(log(n))_ time. As a practical point of reference, it takes about two seconds to construct a vp-tree that contains roughly 30,000 geospatial points on a 2007 MacBook Pro, and about two seconds to execute 10,000 searches against that tree (for a search throughput of about 5,000 searches/second). By contrast, it takes between 300 and 400 milliseconds to sort a list of those 30,000 points by distance from a query point (for a search throughput of 2-3 searches/second).
 
+## Major concepts
+
+The two most important interfaces in the jeospatial library are in the `com.eatthepath.jeospatial` package.
+
+The `GeospatialPoint` interface defines a single point on the earth's surface; concrete implementations of the `GeospatialPoint` interface can be found in the `com.eatthepath.jeospatial.util` package.
+
+The `GeospatialPointDatabase` interface defines the behavioral contract for classes that index collections of `GeospatialPoints` and provide facilities for performing nearest-neighbor searches among those points. The `VPTree` and `LockingVPTree` classes are both concrete implementations of the `GeospatialPointDatabase` class and can be found in the `com.eatthepath.jeospatial.vptree` package.
+
 ## Examples
 
 ### Finding nearest neighbors
