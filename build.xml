@@ -47,7 +47,10 @@
 	</target>
 	
 	<target name="doc">
-		<javadoc sourcepath="${src}" destdir="${doc.javadoc}">
+		<javadoc sourcepath="${src}" destdir="${doc.javadoc}" access="public" windowtitle="jeospatial API Specification" overview="${src}/overview.html">
+			<doctitle>jeospatial API Specification</doctitle>
+			<bottom><![CDATA[<p>jeospatial is an open-source library hosted at <a href="https://github.com/jchambers/jeospatial">https://github.com/jchambers/jeospatial</a>.</p>]]></bottom>
+			
 			<link href="http://docs.oracle.com/javase/6/docs/api/"/>
 		</javadoc>
 	</target>
