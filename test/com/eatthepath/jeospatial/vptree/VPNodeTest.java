@@ -18,6 +18,11 @@ import com.eatthepath.jeospatial.SimpleGeospatialPoint;
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
 import com.eatthepath.jeospatial.util.SearchResults;
 
+/**
+ * Test suite for the VPNode class.
+ * 
+ * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
+ */
 public class VPNodeTest {
     private static final int DEFAULT_BIN_SIZE = 2;
     
@@ -52,6 +57,7 @@ public class VPNodeTest {
         VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint> node =
                 this.tree.new VPNode<SimpleGeospatialPoint>(DEFAULT_BIN_SIZE);
         
+        // New empty nodes should be empty leaf nodes
         assertTrue(node.isLeafNode());
         assertTrue(node.isEmpty());
     }
@@ -63,6 +69,7 @@ public class VPNodeTest {
         VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint> node =
                 this.tree.new VPNode<SimpleGeospatialPoint>(points, 0, points.length, 5);
         
+        // New empty nodes should be empty leaf nodes
         assertFalse(node.isLeafNode());
         assertFalse(node.isEmpty());
     }
@@ -74,9 +81,10 @@ public class VPNodeTest {
         
         this.testNode.addAll(VPNodeTest.cities.values());
         
+        // Node should be non-empty, non-leaf node with all of the cities in the
+        // master list
         assertFalse(this.testNode.isLeafNode());
         assertFalse(this.testNode.isEmpty());
-        
         assertEquals(VPNodeTest.cities.size(), this.testNode.size());
     }
     
@@ -87,6 +95,8 @@ public class VPNodeTest {
         
         this.testNode.add(VPNodeTest.cities.get("Boston"));
         
+        // Node should be a non-empty leaf node with a single point after adding
+        // one point
         assertTrue(this.testNode.isLeafNode());
         assertFalse(this.testNode.isEmpty());
         assertEquals(1, this.testNode.size());
@@ -96,6 +106,7 @@ public class VPNodeTest {
         this.testNode.add(VPNodeTest.cities.get("Chicago"));
         this.testNode.add(VPNodeTest.cities.get("Detroit"));
         
+        // Node should be a non-empty non-leaf node after adding multiple points
         assertFalse(this.testNode.isLeafNode());
         assertFalse(this.testNode.isEmpty());
         assertEquals(5, this.testNode.size());
@@ -122,6 +133,7 @@ public class VPNodeTest {
         
         this.testNode.add(VPNodeTest.cities.get("Boston"));
         
+        // Node should return a non-null, non-empty vector after receiving point
         assertTrue(this.testNode.isLeafNode());
         assertNotNull(this.testNode.getPoints());
         assertFalse(this.testNode.getPoints().isEmpty());
@@ -133,6 +145,7 @@ public class VPNodeTest {
         
         assertFalse(this.testNode.isLeafNode());
         
+        // Non-leaf node should throw an exception
         this.testNode.getPoints();
     }
     
@@ -142,6 +155,7 @@ public class VPNodeTest {
         
         assertFalse(this.testNode.isLeafNode());
         
+        // Non-leaf node should throw an exception
         this.testNode.partition();
     }
     
@@ -150,6 +164,7 @@ public class VPNodeTest {
         assertTrue(this.testNode.isLeafNode());
         assertTrue(this.testNode.isEmpty());
         
+        // Empty node should throw an exception
         this.testNode.partition();
     }
     
@@ -160,6 +175,7 @@ public class VPNodeTest {
         
         this.testNode.add(VPNodeTest.cities.get("Boston"));
         
+        // Node containing fewer than two points should throw an exeption
         this.testNode.partition();
     }
     
@@ -175,15 +191,22 @@ public class VPNodeTest {
             this.testNode.add(city, true, nodesToPartition);
         }
         
+        // We deferred partitioning when adding points; the root node should
+        // still be a leaf, but be over capacity.
         assertTrue(this.testNode.isLeafNode());
         assertFalse(this.testNode.isEmpty());
+        assertTrue(this.testNode.isOverloaded());
         assertEquals(VPNodeTest.cities.size(), this.testNode.size());
         
+        // We should only have a single node to partition
         assertEquals(1, nodesToPartition.size());
         assertTrue(nodesToPartition.contains(this.testNode));
         
+        // Nothing should explode here
         this.testNode.partition();
         
+        // After partitioning, the node should no longer be a leaf node, but the
+        // tree should still contain all of the original points
         assertFalse(this.testNode.isLeafNode());
         assertFalse(this.testNode.isEmpty());
         assertEquals(VPNodeTest.cities.size(), this.testNode.size());
@@ -205,6 +228,8 @@ public class VPNodeTest {
         
         this.testNode.partition(points, 1, 6);
         
+        // Make sure partitioning worked as expected and we didn't include the
+        // first element of the array
         assertFalse(this.testNode.isLeafNode());
         assertFalse(this.testNode.isEmpty());
         assertFalse(this.testNode.contains(VPNodeTest.cities.get("Boston")));
@@ -223,6 +248,7 @@ public class VPNodeTest {
             new SimpleGeospatialPoint(VPNodeTest.cities.get("Boston"))
         };
         
+        // Partitioning should fail if all points are coincident
         this.testNode.partition(points, 0, 6);
     }
     
@@ -239,6 +265,10 @@ public class VPNodeTest {
         
         this.testNode.partition(points, 0, 6);
         
+        // We're cheating a little here; we know the node will choose the first
+        // point in the array as its center and 0 as its median distance; it
+        // should correctly move the distance threshold out to cut off New York
+        // and place it in its own node.
         assertFalse(this.testNode.isLeafNode());
         assertFalse(this.testNode.getCloserNode().isEmpty());
         assertFalse(this.testNode.getFartherNode().isEmpty());
@@ -255,6 +285,9 @@ public class VPNodeTest {
             new SimpleGeospatialPoint(VPNodeTest.cities.get("New York"))
         };
         
+        // Again, we're cheating. We know that the median distance will be at
+        // New York, and the node should pull the threshold in until it cuts off
+        // Boston into its own node.
         this.testNode.partition(points, 0, 6);
         
         assertFalse(this.testNode.isLeafNode());
@@ -297,6 +330,8 @@ public class VPNodeTest {
         java.util.Collections.sort(expectedResults,
                 new GeospatialDistanceComparator<SimpleGeospatialPoint>(somerville));
         
+        // Make sure we're honoring the limit on the number of results and that
+        // they're in the expected order
         assertEquals(3, sortedResults.size());
         assertEquals(expectedResults.subList(0, 3), sortedResults);
         
@@ -304,6 +339,9 @@ public class VPNodeTest {
         this.testNode.getNearestNeighbors(somerville, results);
         sortedResults = results.toSortedList();
         
+        // Make sure we're only finding points within range even though we're
+        // allowed to return more results than will be found; also make sure
+        // they're actually the right results.
         assertEquals(3, sortedResults.size());
         assertEquals(expectedResults.subList(0, 3), sortedResults);
         
@@ -318,6 +356,7 @@ public class VPNodeTest {
         this.testNode.getNearestNeighbors(somerville, results);
         sortedResults = results.toSortedList();
         
+        // Make sure we only find one node and that it's the node we expected.
         assertEquals(1, sortedResults.size());
         assertEquals(VPNodeTest.cities.get("Boston"), sortedResults.get(0));
         
@@ -325,6 +364,8 @@ public class VPNodeTest {
         this.testNode.getNearestNeighbors(somerville, results);
         sortedResults = results.toSortedList();
         
+        // Finally, make sure a "get everything" search returns all of the
+        // results in the right order
         assertEquals(expectedResults, sortedResults);
     }
     
@@ -343,6 +384,7 @@ public class VPNodeTest {
         java.util.Collections.sort(expectedResults,
                 new GeospatialDistanceComparator<SimpleGeospatialPoint>(somerville));
         
+        // Make sure we found everything in range
         assertEquals(3, results.size());
         assertTrue(results.contains(VPNodeTest.cities.get("Boston")));
         assertTrue(results.contains(VPNodeTest.cities.get("New York")));
@@ -358,6 +400,7 @@ public class VPNodeTest {
         results = new Vector<SimpleGeospatialPoint>();
         this.testNode.getAllWithinRange(somerville, 1000 * 1000, criteria, results);
         
+        // Make sure search criteria are being applied as expected
         assertEquals(1, results.size());
         assertTrue(results.contains(VPNodeTest.cities.get("Boston")));
     }
@@ -417,6 +460,7 @@ public class VPNodeTest {
         
         assertFalse(this.testNode.isLeafNode());
         
+        // Removing nodes from a non-leaf node should throw an exception
         this.testNode.remove(VPNodeTest.cities.get("Boston"));
     }
     
@@ -435,6 +479,9 @@ public class VPNodeTest {
     @Test(expected = IllegalStateException.class)
     public void testAbsorbChildrenNonLeafNode() {
         assertTrue(this.testNode.isLeafNode());
+        
+        // Asking a leaf node to absorb its non-existent children should throw
+        // an exception
         this.testNode.absorbChildren();
     }
     
