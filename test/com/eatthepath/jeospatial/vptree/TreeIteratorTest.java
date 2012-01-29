@@ -10,6 +10,11 @@ import org.junit.Test;
 
 import com.eatthepath.jeospatial.SimpleGeospatialPoint;
 
+/**
+ * Test suite for the TreeIterator class.
+ * 
+ * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
+ */
 public class TreeIteratorTest {
     private static final int DEFAULT_BIN_SIZE = 2;
     
@@ -71,6 +76,9 @@ public class TreeIteratorTest {
     @Test(expected = UnsupportedOperationException.class)
     public void testRemove() {
         TreeIterator<SimpleGeospatialPoint> i = new TreeIterator<SimpleGeospatialPoint>(this.testNode);
+        
+        // We don't support removal from iterators, so this should always throw
+        // an exception
         i.remove();
     }
 }

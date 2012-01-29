@@ -30,6 +30,11 @@ public abstract class GeospatialPointDatabaseTest {
         GeospatialPointDatabaseTest.cities.put("Detroit", new SimpleGeospatialPoint(42.348937, -83.08994));
     }
     
+    /**
+     * Returns a new, empty database for testing.
+     * 
+     * @return a new, empty database
+     */
     public abstract GeospatialPointDatabase<SimpleGeospatialPoint> createEmptyDatabase();
     
     @Test

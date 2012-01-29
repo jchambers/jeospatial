@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Vector;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -111,12 +112,21 @@ public class SearchResultsTest {
         SearchResults<SimpleGeospatialPoint> results = new SearchResults<SimpleGeospatialPoint>(somerville, 4);
         results.addAll(SearchResultsTest.cities.values());
         
+        // Make sure we store everything when we have the capacity to do so
         assertEquals(4, results.size());
-        
         assertTrue(results.contains(SearchResultsTest.cities.get("Boston")));
         assertTrue(results.contains(SearchResultsTest.cities.get("New York")));
         assertTrue(results.contains(SearchResultsTest.cities.get("Detroit")));
         assertTrue(results.contains(SearchResultsTest.cities.get("Chicago")));
+        
+        results = new SearchResults<SimpleGeospatialPoint>(somerville, 2);
+        results.addAll(SearchResultsTest.cities.values());
+        
+        // Make sure we're still enforcing distance cutoffs when we don't have
+        // capacity for everything
+        assertEquals(2, results.size());
+        assertTrue(results.contains(SearchResultsTest.cities.get("Boston")));
+        assertTrue(results.contains(SearchResultsTest.cities.get("New York")));
     }
     
     @Test
@@ -141,11 +151,14 @@ public class SearchResultsTest {
         
         List<SimpleGeospatialPoint> sortedResults = results.toSortedList();
         
-        assertEquals(4, sortedResults.size());
+        List<SimpleGeospatialPoint> expectedResults =
+                new Vector<SimpleGeospatialPoint>(SearchResultsTest.cities.values());
         
-        assertEquals(SearchResultsTest.cities.get("Boston"), sortedResults.get(0));
-        assertEquals(SearchResultsTest.cities.get("New York"), sortedResults.get(1));
-        assertEquals(SearchResultsTest.cities.get("Detroit"), sortedResults.get(2));
-        assertEquals(SearchResultsTest.cities.get("Chicago"), sortedResults.get(3));
+        java.util.Collections.sort(expectedResults, new GeospatialDistanceComparator<SimpleGeospatialPoint>(somerville));
+        
+        expectedResults = expectedResults.subList(0, 4);
+        
+        assertEquals(4, sortedResults.size());
+        assertEquals(expectedResults, sortedResults);
     }
 }

@@ -28,6 +28,7 @@ public class SimpleGeospatialPointTest extends GeospatialPointTest {
 		SimpleGeospatialPoint a = new SimpleGeospatialPoint(10, 20);
 		SimpleGeospatialPoint b = new SimpleGeospatialPoint(a);
 		
+		// Make sure we're not .equal by accident
 		assertNotSame(a, b);
 		assertEquals(a, b);
 		
