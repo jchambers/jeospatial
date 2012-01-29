@@ -33,6 +33,62 @@ public abstract class GeospatialPointDatabaseTest {
     public abstract GeospatialPointDatabase<SimpleGeospatialPoint> getDatabase();
     
     @Test
+    public void testGetNearestNeighborGeospatialPoint() {
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        database.addAll(GeospatialPointDatabaseTest.cities.values());
+        
+        SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
+        
+        assertEquals(GeospatialPointDatabaseTest.cities.get("Boston"), database.getNearestNeighbor(somerville));
+    }
+    
+    @Test
+    public void testGetNearestNeighborGeospatialPointDouble() {
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        database.addAll(GeospatialPointDatabaseTest.cities.values());
+        
+        SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
+        
+        assertEquals(GeospatialPointDatabaseTest.cities.get("Boston"), database.getNearestNeighbor(somerville, 1000 * 1000));
+        assertNull(database.getNearestNeighbor(new SimpleGeospatialPoint(0, 0), 1000 * 1000));
+    }
+    
+    @Test
+    public void testGetNearestNeighborGeospatialPointSearchCriteria() {
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        database.addAll(GeospatialPointDatabaseTest.cities.values());
+        
+        SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
+        
+        SearchCriteria<SimpleGeospatialPoint> criteria = new SearchCriteria<SimpleGeospatialPoint>() {
+            @Override
+            public boolean matches(SimpleGeospatialPoint p) {
+                return p.getLatitude() < 40.0;
+            }
+        };
+        
+        assertEquals(GeospatialPointDatabaseTest.cities.get("Memphis"), database.getNearestNeighbor(somerville, criteria));
+    }
+    
+    @Test
+    public void testGetNearestNeighborGeospatialPointDoubleSearchCriteria() {
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        database.addAll(GeospatialPointDatabaseTest.cities.values());
+        
+        SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
+        
+        SearchCriteria<SimpleGeospatialPoint> criteria = new SearchCriteria<SimpleGeospatialPoint>() {
+            @Override
+            public boolean matches(SimpleGeospatialPoint p) {
+                return p.getLatitude() < 40.0;
+            }
+        };
+        
+        assertEquals(GeospatialPointDatabaseTest.cities.get("Memphis"), database.getNearestNeighbor(somerville, 2000 * 1000, criteria));
+        assertNull(database.getNearestNeighbor(new SimpleGeospatialPoint(0, 0), 2000 * 1000, criteria));
+    }
+    
+    @Test
     public void testGetNearestNeighborsGeospatialPointInt() {
         GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());

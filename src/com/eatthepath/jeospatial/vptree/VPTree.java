@@ -1126,4 +1126,36 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             this.add(point);
         }
     }
+    
+    @Override
+    public E getNearestNeighbor(GeospatialPoint queryPoint) {
+        SearchResults<E> results = new SearchResults<E>(queryPoint, 1);
+        this.root.getNearestNeighbors(queryPoint, results);
+        
+        return results.peek();
+    }
+
+    @Override
+    public E getNearestNeighbor(GeospatialPoint queryPoint, double maxDistance) {
+        SearchResults<E> results = new SearchResults<E>(queryPoint, 1, maxDistance);
+        this.root.getNearestNeighbors(queryPoint, results);
+        
+        return results.peek();
+    }
+
+    @Override
+    public E getNearestNeighbor(GeospatialPoint queryPoint, SearchCriteria<E> searchCriteria) {
+        SearchResults<E> results = new SearchResults<E>(queryPoint, 1, searchCriteria);
+        this.root.getNearestNeighbors(queryPoint, results);
+        
+        return results.peek();
+    }
+
+    @Override
+    public E getNearestNeighbor(GeospatialPoint queryPoint, double maxDistance, SearchCriteria<E> searchCriteria) {
+        SearchResults<E> results = new SearchResults<E>(queryPoint, 1, maxDistance, searchCriteria);
+        this.root.getNearestNeighbors(queryPoint, results);
+        
+        return results.peek();
+    }
 }
