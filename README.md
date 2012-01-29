@@ -68,4 +68,4 @@ The `closestOutsideMA` list will contain the ten closest zip codes to Davis Squa
 Acknowledgements
 ----------------
 
-[United States ZIP code data](http://www.census.gov/tiger/tms/gazetteer/zips.txt) used in examples comes from [The United States Census Bureau](http://www.census.gov/). Examples make use of the [opencsv](http://opencsv.sourceforge.net/) library under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+[United States ZIP code data](http://www.census.gov/tiger/tms/gazetteer/zips.txt) used in examples and unit tests comes from [The United States Census Bureau](http://www.census.gov/). Examples and unit tests make use of the [opencsv](http://opencsv.sourceforge.net/) library under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
