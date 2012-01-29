@@ -89,5 +89,13 @@ public class CachingGeospatialPoint extends SimpleGeospatialPoint {
 		
 		return Double.isNaN(angle) ? 0 : GeospatialPoint.EARTH_RADIUS * angle;
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see com.eatthepath.jeospatial.SimpleGeospatialPoint#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object other) {
+	    return super.equals(other);
+	}
 }
