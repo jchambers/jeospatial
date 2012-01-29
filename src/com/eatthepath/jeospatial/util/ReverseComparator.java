@@ -35,6 +35,6 @@ public class ReverseComparator<T> implements Comparator<T> {
 	 */
 	@Override
 	public int compare(final T a, final T b) {
-		return -this.delegate.compare(a, b);
+		return this.delegate.compare(b, a);
 	}
 }
