@@ -454,6 +454,10 @@ public abstract class GeospatialPointDatabaseTest {
     public void testRemoveAll() {
         GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
+        database.add(GeospatialPointDatabaseTest.cities.get("Boston"));
+        // Add Boston a second time; the behavioral contract for the Collection
+        // interface states, "After this call returns, this collection will
+        // contain no elements in common with the specified collection."
         
         Vector<SimpleGeospatialPoint> citiesToRemove = new Vector<SimpleGeospatialPoint>();
         
@@ -461,12 +465,8 @@ public abstract class GeospatialPointDatabaseTest {
         citiesToRemove.add(GeospatialPointDatabaseTest.cities.get("Las Vegas"));
         citiesToRemove.add(GeospatialPointDatabaseTest.cities.get("Detroit"));
         
-        // TODO Clarify behavior when multiple copies of the same point exist in a database
-        
         assertTrue(database.removeAll(citiesToRemove));
         assertFalse(database.removeAll(citiesToRemove));
-        
-        assertEquals(GeospatialPointDatabaseTest.cities.size() - citiesToRemove.size(), database.size());
         
         for(SimpleGeospatialPoint p : citiesToRemove) {
             assertFalse(database.contains(p));

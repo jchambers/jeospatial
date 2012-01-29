@@ -32,6 +32,26 @@ import com.eatthepath.jeospatial.util.SearchResults;
  * <p>Queries in a vp-tree execute in O(log n) time in the best case, and tree
  * construction takes O(n log n) time.</p>
  * 
+ * <p>Vantage point trees may optionally be constructed with a
+ * {@code nodeCapacity} argument. The node capacity dictates the maximum number
+ * of points that <em>should</em> be stored in any given leaf node, although
+ * nodes may hold more than that many points if its contents can't be
+ * partitioned (i.e. all of the points in the node are coincident).</p>
+ * 
+ * <p>When a search executed against a vp-tree reaches a leaf node, all of the
+ * points in that node are considered for inclusion in the result set. It's
+ * possible that a k-nearest-neighbor search will only need to visit one leaf
+ * node if that node contains all of the k nearest neighbors to the query point.
+ * A "good" node capacity for a vp-tree will be orders of magnitude smaller than
+ * the size of the whole dataset and slightly larger (on the same order of
+ * magnitude) than the "usual" number of nearest neighbors returned in a search;
+ * a well-chosen node capacity will make searches more efficient by minimizing
+ * the number of nodes that need to be visited while still minimizing the number
+ * of "bad" points considered.</p>
+ * 
+ * <p>The default node capacity for a vp-tree is {@value DEFAULT_BIN_SIZE}
+ * points.</p>
+ * 
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  * 
  * @see <a href="http://pnylab.com/pny/papers/vptree/main.html">Yianilos, Peter
@@ -40,6 +60,16 @@ import com.eatthepath.jeospatial.util.SearchResults;
  *      Symposium on Discrete Algorithms (SODA). 1993.</a>
  */
 public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabase<E> {
+    /**
+     * <p>{@code VPNodes} are the nodes of a vantage point tree. {@code VPNodes}
+     * may or may not be leaf nodes; if they are leaf nodes, they have no
+     * children (their child node members will be {@code null}) and they will
+     * have a non-null {@code points} member that contains all of the points
+     * stored in the node.</p>
+     * 
+     * <p>Non-leaf nodes will have non-{@code null} children and contain no
+     * points of their own.</p>
+     */
     protected class VPNode<T extends GeospatialPoint> {
         private CachingGeospatialPoint center;
         private double threshold;
@@ -106,7 +136,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
          * 
          * @see VPNode#isLeafNode()
          */
-        protected VPNode<T> getCloserNode() {
+        public VPNode<T> getCloserNode() {
             return this.closer;
         }
         
@@ -120,7 +150,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
          * 
          * @see VPNode#isLeafNode()
          */
-        protected VPNode<T> getFartherNode() {
+        public VPNode<T> getFartherNode() {
             return this.farther;
         }
         
@@ -129,11 +159,30 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
          * 
          * @return a point that is coincident with this node's center point
          */
-        protected GeospatialPoint getCenter() {
+        public GeospatialPoint getCenter() {
             return new SimpleGeospatialPoint(this.center);
         }
         
-        protected double getThreshold() {
+        /**
+         * Returns the distance threshold for this node if it is a non-leaf
+         * node. Points that have a distance to this node's center less than or
+         * equal to the distance threshold are stored in the "closer" child node
+         * of this tree while points with a distance from the center greater
+         * than the threshold are stored in the "farther" node.
+         * 
+         * @return the distance threshold for this node
+         * 
+         * @throws IllegalStateException if this node is a leaf node
+         * 
+         * @see VPNode#getCenter()
+         * @see VPNode#getCloserNode()
+         * @see VPNode#getFartherNode()
+         */
+        public double getThreshold() {
+            if(this.isLeafNode()) {
+                throw new IllegalStateException("Leaf nodes do not have a distance threshold.");
+            }
+            
             return this.threshold;
         }
         
@@ -324,7 +373,18 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             return new Vector<T>(this.points);
         }
         
-        protected void partition() throws PartitionException {
+        /**
+         * Attempts to partition the points contained in this node into two
+         * child nodes. Partitioning this node may trigger recursive
+         * partitioning attempts in the generated child nodes.
+         * 
+         * @throws PartitionException
+         *             if this node is node a leaf node, if this node is empty,
+         *             or if no viable distance threshold could be found (i.e.
+         *             all points in this node have the same distance from the
+         *             node's center)
+         */
+        public void partition() throws PartitionException {
             if(!this.isLeafNode()) {
                 throw new PartitionException("Cannot partition a non-leaf node.");
             }
@@ -339,6 +399,32 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             }
         }
         
+        /**
+         * Attempts to partition the points in a subset of the given array into
+         * two child nodes based on their distance from the center of this node.
+         * This method chooses a center point if none exists and chooses a
+         * distance threshold to use as the criterion for node partitioning. The
+         * threshold is chosen to be as close to the median distance of the
+         * points in the sub-array as possible while still partitioning the
+         * points into two groups. The child nodes generated by this method may
+         * be partitioned recursively.
+         * 
+         * @param points
+         *            an array from which to partition a subset of points
+         * @param fromIndex
+         *            the start index of the sub-array of points to partition
+         *            (inclusive)
+         * @param toIndex
+         *            the end index of the sub-array of points to partition
+         *            (exclusive)
+         * 
+         * @throws PartitionException
+         *             if the range specified by {@code fromIndex} and
+         *             {@code toIndex} includes fewer than two points or if no
+         *             viable distance threshold could be found (i.e. all of the
+         *             points in the subarray have the same distance from this
+         *             node's center point)
+         */
         protected void partition(T[] points, int fromIndex, int toIndex) throws PartitionException {
             // We can't partition fewer then two points.
             if(toIndex - fromIndex < 2) {
@@ -352,7 +438,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
                 this.center = new CachingGeospatialPoint(points[fromIndex]);
             }
 
-            // TODO Consider optimizing this
+            // TODO Consider optimizing this whole approach to partitioning
             java.util.Arrays.sort(points, fromIndex, toIndex,
                     new GeospatialDistanceComparator<T>(this.center));
             
@@ -454,6 +540,15 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             }
         }
         
+        /**
+         * Tests whether this node contains more points than its maximum
+         * capacity.
+         * 
+         * @return {@code true} if the number of points stored in this node is
+         *         greater than its capacity or {@code false} otherwise
+         * 
+         * @throws IllegalStateException if this is not a leaf node
+         */
         public boolean isOverloaded() {
             if(!this.isLeafNode()) {
                 throw new IllegalStateException("Non-leaf nodes cannot be overloaded.");
@@ -462,7 +557,17 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             return this.points.size() > this.binSize;
         }
 
-        protected void getNearestNeighbors(final GeospatialPoint queryPoint, final SearchResults<T> results) {
+        /**
+         * Populates the given search result set with points close to the query
+         * point. If this node is a leaf node, all of its contained points are
+         * "offered" to the search result set as potential nearest neighbors. If
+         * this is not a leaf node, one or both of its children are searched
+         * recursively.
+         * 
+         * @param queryPoint the point for which to find nearby neighbors
+         * @param results the result set to which to offer points
+         */
+        public void getNearestNeighbors(final GeospatialPoint queryPoint, final SearchResults<T> results) {
             // If this is a leaf node, our job is easy. Offer all of our points
             // to the result set and bail out.
             if(this.isLeafNode()) {
@@ -514,7 +619,28 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             }
         }
         
-        protected void getAllWithinRange(final CachingGeospatialPoint queryPoint, final double maxDistance, final SearchCriteria<T> criteria, final Vector<T> results) {
+        /**
+         * Populates the given {@code Vector} with all points within the given
+         * range that match the given search criteria (if any). If this node is
+         * a leaf node, all points contained within the node that are within the
+         * given distance of the query point and match the search criteria are
+         * added to the {@code Vector}. If this node is not a leaf node, its
+         * children are searched recursively.
+         * 
+         * @param queryPoint
+         *            the point for which to find nearby neighbors
+         * @param maxDistance
+         *            the maximum distance within which points should be added
+         *            to the result set
+         * @param criteria
+         *            the search criteria to apply to potential matches; if
+         *            {@code null}, only a point's distance from the query point
+         *            is considered when deciding to include it in the result
+         *            set
+         * @param results
+         *            the {@code Vector} to populate
+         */
+        public void getAllWithinRange(final CachingGeospatialPoint queryPoint, final double maxDistance, final SearchCriteria<T> criteria, final Vector<T> results) {
             // If this is a leaf node, just add all of our points to the list if
             // they fall within range and meet the search criteria (if any).
             if(this.isLeafNode()) {
@@ -545,11 +671,36 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             }
         }
         
-        protected void addPointsToArray(Object[] array) {
+        /**
+         * Adds all of the points from this node if it is a leaf node or its
+         * children if it is not to an array. It is the responsibility of the
+         * caller to ensure that the array has sufficient capacity to hold all
+         * of the points in this node and its children.
+         * 
+         * @param array
+         *            the array to which to add points
+         * 
+         * @see VPNode#size()
+         */
+        public void addPointsToArray(Object[] array) {
             this.addPointsToArray(array, 0);
         }
         
-        protected int addPointsToArray(Object[] array, int offset) {
+        /**
+         * Adds all of the points from this node and its children to the given
+         * array starting at the given offset. It is the responsibility of the
+         * caller to ensure that the array has sufficient capacity to hold all
+         * of the points in this node and its children.
+         * 
+         * @param array
+         *            the array to which to ad points
+         * @param offset
+         *            the starting index (inclusive) of the array to begin
+         *            adding points
+         * 
+         * @return the number of points added to the array
+         */
+        public int addPointsToArray(Object[] array, int offset) {
             if(this.isLeafNode()) {
                 if(this.isEmpty()) { return 0; }
                 
@@ -564,7 +715,19 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             }
         }
         
-        public void findNodeContainingPoint(GeospatialPoint p, Deque<VPNode<T>> stack) {
+        /**
+         * Finds the node at or below this node that contains (or would contain)
+         * the given point. The given stack is populated with each node on the
+         * path to the leaf node that contains the given point.
+         * 
+         * @param p
+         *            the point for which to find the containing node
+         * @param stack
+         *            the stack to populate with the chain of nodes leading to
+         *            the leaf node that contains or would contain the given
+         *            point
+         */
+        public void findNodeContainingPoint(final GeospatialPoint p, final Deque<VPNode<T>> stack) {
             // First things first; add ourselves to the stack.
             stack.push(this);
             
@@ -579,6 +742,18 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             }
         }
         
+        /**
+         * Removes a point from this node's internal list of points.
+         * 
+         * @param point
+         *            the point to remove from this node
+         * 
+         * @return {@code true} if the point was removed from this node (i.e.
+         *         this node actually contained the given point) or
+         *         {@code false} otherwise
+         * 
+         * @throws IllegalStateException if this node is not a leaf node
+         */
         public boolean remove(T point) {
             if(this.isLeafNode()) {
                 return this.points.remove(point);
@@ -587,6 +762,13 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             }
         }
         
+        /**
+         * Recursively absorbs the points contained in this node's children into
+         * this node, making this node a leaf node in the process.
+         * 
+         * @throws IllegalStateException
+         *             if this node is a leaf node (and thus has no children)
+         */
         public void absorbChildren() {
             if(this.isLeafNode()) {
                 throw new IllegalStateException("Leaf nodes have no children.");
@@ -609,6 +791,12 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             this.farther = null;
         }
         
+        /**
+         * Populates the given {@code List} with all of the leaf nodes that are
+         * descendants of this node.
+         * 
+         * @param leafNodes the list to populate with leaf nodes
+         */
         public void gatherLeafNodes(List<VPNode<T>> leafNodes) {
             if(this.isLeafNode()) {
                 leafNodes.add(this);
@@ -618,6 +806,15 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             }
         }
         
+        /**
+         * Tests whether this node is an ancestor of the given node.
+         * 
+         * @param node
+         *            the node for which to test ancestry
+         * 
+         * @return {@code true} if the given node is a descendant of this node
+         *         or {@code false} otherwise
+         */
         public boolean isAncestorOfNode(VPNode<T> node) {
             // Obviously, leaf nodes can't be the ancestors of anything
             if(this.isLeafNode()) { return false; }
@@ -632,7 +829,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         }
     }
     
-    private static final int DEFAULT_BIN_SIZE = 32;
+    public static final int DEFAULT_BIN_SIZE = 32;
     private final int binSize;
     
     private VPNode<E> root;
@@ -910,8 +1107,14 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
                 @SuppressWarnings("unchecked")
                 E point = (E)o;
                 
-                boolean pointRemoved = this.remove(point, true, nodesToPrune);
-                anyChanged = anyChanged || pointRemoved;
+                // The behavioral contact for Collections states, "After this
+                // call returns, this collection will contain no elements in
+                // common with the specified collection." Make sure we remove
+                // all instances of each point in the collection of points to
+                // remove.
+                while(this.remove(point, true, nodesToPrune)) {
+                    anyChanged = true;
+                }
             } catch(ClassCastException e) {
                 // The object wasn't the kind of point we have in this tree;
                 // just keep moving.
@@ -951,6 +1154,20 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         return anyChanged;
     }
     
+    /**
+     * <p>"Prunes" an empty leaf node from the tree. When a node is pruned, its
+     * parent absorbs the points from both of its child nodes (though only one
+     * may actually contain points) and discards its child nodes. If the parent
+     * node is empty after the absorption of its child nodes, it is also pruned;
+     * this process continues until either an ancestor of the original node is
+     * non-empty after absorbing its children or until the root of the tree is
+     * reached.</p>
+     * 
+     * <p>The pruning process may leave an ancestor node overly-full, in which
+     * case it is the responsibility of the caller to repartition that node.</p>
+     * 
+     * @param node the empty node to prune from the tree
+     */
     protected void pruneEmptyNode(VPNode<E> node) {
         // Only spend time working on this if the node is actually empty; it's
         // harmless to call this method on a non-empty node, though.
@@ -987,6 +1204,8 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
      */
     @Override
     public boolean retainAll(Collection<?> c) {
+        // We need to build up a list of points to remove after the initial
+        // search to avoid concurrent modification woes
         Vector<E> pointsToRemove = new Vector<E>();
         
         for(E point : this) {
@@ -1057,6 +1276,10 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#getNearestNeighbors(com.eatthepath.jeospatial.GeospatialPoint, int)
+     */
     @Override
     public List<E> getNearestNeighbors(GeospatialPoint queryPoint, int maxResults) {
         SearchResults<E> results = new SearchResults<E>(queryPoint, maxResults);
@@ -1065,6 +1288,10 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         return results.toSortedList();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#getNearestNeighbors(com.eatthepath.jeospatial.GeospatialPoint, int, double)
+     */
     @Override
     public List<E> getNearestNeighbors(GeospatialPoint queryPoint, int maxResults, double maxDistance) {
         SearchResults<E> results = new SearchResults<E>(queryPoint, maxResults, maxDistance);
@@ -1073,6 +1300,10 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         return results.toSortedList();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#getNearestNeighbors(com.eatthepath.jeospatial.GeospatialPoint, int, com.eatthepath.jeospatial.SearchCriteria)
+     */
     @Override
     public List<E> getNearestNeighbors(GeospatialPoint queryPoint, int maxResults, SearchCriteria<E> searchCriteria) {
         SearchResults<E> results = new SearchResults<E>(queryPoint, maxResults, searchCriteria);
@@ -1081,6 +1312,10 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         return results.toSortedList();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#getNearestNeighbors(com.eatthepath.jeospatial.GeospatialPoint, int, double, com.eatthepath.jeospatial.SearchCriteria)
+     */
     @Override
     public List<E> getNearestNeighbors(GeospatialPoint queryPoint, int maxResults, double maxDistance, SearchCriteria<E> searchCriteria) {
         SearchResults<E> results = new SearchResults<E>(queryPoint, maxResults, maxDistance, searchCriteria);
@@ -1089,11 +1324,19 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         return results.toSortedList();
     }
 
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#getAllNeighborsWithinDistance(com.eatthepath.jeospatial.GeospatialPoint, double)
+     */
     @Override
     public List<E> getAllNeighborsWithinDistance(GeospatialPoint queryPoint, double maxDistance) {
         return this.getAllNeighborsWithinDistance(queryPoint, maxDistance, null);
     }
 
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#getAllNeighborsWithinDistance(com.eatthepath.jeospatial.GeospatialPoint, double, com.eatthepath.jeospatial.SearchCriteria)
+     */
     @Override
     public List<E> getAllNeighborsWithinDistance(GeospatialPoint queryPoint, double maxDistance, SearchCriteria<E> searchCriteria) {
         Vector<E> results = new Vector<E>(this.binSize);
@@ -1104,11 +1347,67 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         return results;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#getNearestNeighbor(com.eatthepath.jeospatial.GeospatialPoint)
+     */
+    @Override
+    public E getNearestNeighbor(GeospatialPoint queryPoint) {
+        SearchResults<E> results = new SearchResults<E>(queryPoint, 1);
+        this.root.getNearestNeighbors(queryPoint, results);
+        
+        return results.peek();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#getNearestNeighbor(com.eatthepath.jeospatial.GeospatialPoint, double)
+     */
+    @Override
+    public E getNearestNeighbor(GeospatialPoint queryPoint, double maxDistance) {
+        SearchResults<E> results = new SearchResults<E>(queryPoint, 1, maxDistance);
+        this.root.getNearestNeighbors(queryPoint, results);
+        
+        return results.peek();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#getNearestNeighbor(com.eatthepath.jeospatial.GeospatialPoint, com.eatthepath.jeospatial.SearchCriteria)
+     */
+    @Override
+    public E getNearestNeighbor(GeospatialPoint queryPoint, SearchCriteria<E> searchCriteria) {
+        SearchResults<E> results = new SearchResults<E>(queryPoint, 1, searchCriteria);
+        this.root.getNearestNeighbors(queryPoint, results);
+        
+        return results.peek();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#getNearestNeighbor(com.eatthepath.jeospatial.GeospatialPoint, double, com.eatthepath.jeospatial.SearchCriteria)
+     */
+    @Override
+    public E getNearestNeighbor(GeospatialPoint queryPoint, double maxDistance, SearchCriteria<E> searchCriteria) {
+        SearchResults<E> results = new SearchResults<E>(queryPoint, 1, maxDistance, searchCriteria);
+        this.root.getNearestNeighbors(queryPoint, results);
+        
+        return results.peek();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#movePoint(com.eatthepath.jeospatial.GeospatialPoint, double, double)
+     */
     @Override
     public void movePoint(E point, double latitude, double longitude) {
         this.movePoint(point, new SimpleGeospatialPoint(latitude, longitude));
     }
 
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#movePoint(com.eatthepath.jeospatial.GeospatialPoint, com.eatthepath.jeospatial.GeospatialPoint)
+     */
     @Override
     public void movePoint(E point, GeospatialPoint destination) {
         // Moving points can trigger significant structural changes to a
@@ -1142,37 +1441,5 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             
             this.add(point);
         }
-    }
-    
-    @Override
-    public E getNearestNeighbor(GeospatialPoint queryPoint) {
-        SearchResults<E> results = new SearchResults<E>(queryPoint, 1);
-        this.root.getNearestNeighbors(queryPoint, results);
-        
-        return results.peek();
-    }
-
-    @Override
-    public E getNearestNeighbor(GeospatialPoint queryPoint, double maxDistance) {
-        SearchResults<E> results = new SearchResults<E>(queryPoint, 1, maxDistance);
-        this.root.getNearestNeighbors(queryPoint, results);
-        
-        return results.peek();
-    }
-
-    @Override
-    public E getNearestNeighbor(GeospatialPoint queryPoint, SearchCriteria<E> searchCriteria) {
-        SearchResults<E> results = new SearchResults<E>(queryPoint, 1, searchCriteria);
-        this.root.getNearestNeighbors(queryPoint, results);
-        
-        return results.peek();
-    }
-
-    @Override
-    public E getNearestNeighbor(GeospatialPoint queryPoint, double maxDistance, SearchCriteria<E> searchCriteria) {
-        SearchResults<E> results = new SearchResults<E>(queryPoint, 1, maxDistance, searchCriteria);
-        this.root.getNearestNeighbors(queryPoint, results);
-        
-        return results.peek();
     }
 }
