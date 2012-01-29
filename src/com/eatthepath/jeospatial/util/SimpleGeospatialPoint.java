@@ -92,8 +92,10 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 		return Double.isNaN(angle) ? 0 : GeospatialPoint.EARTH_RADIUS * angle;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
+	/**
+	 * Returns a human-readable {@code String} representation of this point.
+	 * 
+	 * @return a {@code String} representation of this point
 	 */
 	@Override
 	public String toString() {
@@ -101,8 +103,10 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 				+ longitude + "]";
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
+	/**
+	 * Generates a hash code value for this point.
+	 * 
+	 * @return a hash code value for this point
 	 */
 	@Override
 	public int hashCode() {
@@ -116,9 +120,15 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 		return result;
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+    /**
+     * Compares this point to another object. The other object is considered
+     * equal if it is not {@code null}, is also a {@code SimpleGeospatialPoint}
+     * (or a subclass thereof), and has the same latitude and longitude as this
+     * point.
+     * 
+     * @return {@code true} if the other object is equal to this point or
+     *         {@code false} otherwise
+     */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
