@@ -1,45 +1,21 @@
 package com.eatthepath.jeospatial.example;
 
-import java.io.FileReader;
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Random;
-import java.util.Vector;
 
 import com.eatthepath.jeospatial.SimpleGeospatialPoint;
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
 import com.eatthepath.jeospatial.vptree.VPTree;
 
-import au.com.bytecode.opencsv.CSVReader;
-
 public class ZipCodeTestApp {
     public static void main(String[] args) throws IOException {
-        Vector<ZipCode> zipCodes = new Vector<ZipCode>();
-        
-        CSVReader reader = new CSVReader(new FileReader("data/zips.csv"));
-        int rowsRead = 0;
-        
         long start = System.currentTimeMillis();
-        
-        try {
-            String[] row = reader.readNext();
-            
-            while(row != null) {
-                rowsRead += 1;
-                
-                double longitude = -Double.parseDouble(row[4]);
-                double latitude = Double.parseDouble(row[5]);
-                
-                zipCodes.add(new ZipCode(row[1], row[3], row[2], latitude, longitude));
-                
-                row = reader.readNext();
-            }
-        } finally {
-            reader.close();
-        }
-        
+        List<ZipCode> zipCodes = ZipCode.loadAllFromCsvFile(new File("data/zips.csv"));
         long end = System.currentTimeMillis();
         
-        System.out.format("Loaded %d zip codes in %d milliseconds.\n", rowsRead, end - start);
+        System.out.format("Loaded %d zip codes in %d milliseconds.\n", zipCodes.size(), end - start);
         
         // Now put all of those zip codes into a vp-tree
         start = System.currentTimeMillis();
