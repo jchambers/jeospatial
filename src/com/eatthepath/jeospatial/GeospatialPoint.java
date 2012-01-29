@@ -18,17 +18,27 @@ public interface GeospatialPoint {
      */
     public static final double EARTH_RADIUS = 6371000; // meters
     
-	/**
-	 * Sets the latitude of this point.
-	 * 
-	 * @param latitude the latitude of this point in degrees
-	 */
+    /**
+     * Sets the latitude of this point. Note that, for points in a
+     * {@link GeospatialPointDatabase}, this method should not be called
+     * directly. The database's {@code movePoint} method should be used instead.
+     * 
+     * @param latitude the latitude of this point in degrees
+     * 
+     * @see GeospatialPointDatabase#movePoint(GeospatialPoint, GeospatialPoint)
+     * @see GeospatialPointDatabase#movePoint(GeospatialPoint, double, double)
+     */
 	public void setLatitude(double latitude);
 	
 	/**
-	 * Sets the longitude of this point.
+	 * Sets the longitude of this point. Note that, for points in a
+     * {@link GeospatialPointDatabase}, this method should not be called
+     * directly. The database's {@code movePoint} method should be used instead.
 	 * 
 	 * @param longitude the longitude of this point in degrees
+	 * 
+     * @see GeospatialPointDatabase#movePoint(GeospatialPoint, GeospatialPoint)
+     * @see GeospatialPointDatabase#movePoint(GeospatialPoint, double, double)
 	 */
 	public void setLongitude(double longitude);
 	
