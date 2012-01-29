@@ -10,24 +10,37 @@ import com.eatthepath.jeospatial.GeospatialPointDatabase;
 import com.eatthepath.jeospatial.GeospatialPointDatabaseTest;
 import com.eatthepath.jeospatial.SimpleGeospatialPoint;
 
+/**
+ * Test suite for the VPTree class.
+ * 
+ * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
+ */
 public class VPTreeTest extends GeospatialPointDatabaseTest {
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabaseTest#createEmptyDatabase()
+     */
     @Override
-    public GeospatialPointDatabase<SimpleGeospatialPoint> getDatabase() {
+    public GeospatialPointDatabase<SimpleGeospatialPoint> createEmptyDatabase() {
         return new VPTree<SimpleGeospatialPoint>();
     }
     
     @Test
     public void testVPTree() {
+        // Just make sure nothing blows up here
         new VPTree<SimpleGeospatialPoint>();
     }
     
     @Test
     public void testVPTreeInt() {
+        // Make sure bin size is getting set as expected
         assertEquals(7, new VPTree<SimpleGeospatialPoint>(7).getBinSize());
     }
     
     @Test
     public void testVPTreeCollectionOfE() {
+        // Make sure trees created from an existing collection actually contain
+        // all of the points in that collection
         VPTree<SimpleGeospatialPoint> tree = new VPTree<SimpleGeospatialPoint>(
                 GeospatialPointDatabaseTest.cities.values());
         
@@ -37,6 +50,8 @@ public class VPTreeTest extends GeospatialPointDatabaseTest {
     
     @Test
     public void testVPTreeCollectionOfEInt() {
+        // Make sure trees created from an existing collection actually contain
+        // all of the points in that collection and have the expected bin size
         VPTree<SimpleGeospatialPoint> tree = new VPTree<SimpleGeospatialPoint>(
                 GeospatialPointDatabaseTest.cities.values(), 7);
         
@@ -45,12 +60,6 @@ public class VPTreeTest extends GeospatialPointDatabaseTest {
         assertEquals(7, tree.getBinSize());
     }
     
-    @Override
-    @Test(expected = UnsupportedOperationException.class)
-    public void testRetainAll() {
-        this.getDatabase().retainAll(GeospatialPointDatabaseTest.cities.values());
-    }
-
     @Test
     public void testPruneEmptyNode() {
         VPTree<SimpleGeospatialPoint> tree = new VPTree<SimpleGeospatialPoint>(
@@ -67,9 +76,13 @@ public class VPTreeTest extends GeospatialPointDatabaseTest {
             assertTrue(tree.remove(p, true, nodesToPrune));
         }
         
+        // Figure out which child node (it may be both, but we just need one) to
+        // prune
         VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint> nodeToPrune = 
                 !tree.getRoot().getCloserNode().isLeafNode() ? tree.getRoot().getCloserNode() : tree.getRoot().getFartherNode();
         
+        // The root node should become an empty leaf node after the pruning, but
+        // not before
         assertFalse(nodeToPrune.isLeafNode());
         assertTrue(nodeToPrune.isEmpty());
         
@@ -83,6 +96,7 @@ public class VPTreeTest extends GeospatialPointDatabaseTest {
         tree.add(GeospatialPointDatabaseTest.cities.get("Boston"));
         tree.add(GeospatialPointDatabaseTest.cities.get("New York"));
         
+        // Make sure the tree is in the state we'd expect
         assertFalse(tree.getRoot().isLeafNode());
         assertTrue(tree.getRoot().getCloserNode().isLeafNode());
         assertTrue(tree.getRoot().getFartherNode().isLeafNode());
@@ -92,9 +106,12 @@ public class VPTreeTest extends GeospatialPointDatabaseTest {
         assertTrue(tree.getRoot().getCloserNode().isEmpty() || tree.getRoot().getFartherNode().isEmpty());
         assertFalse(tree.getRoot().getCloserNode().isEmpty() && tree.getRoot().getFartherNode().isEmpty());
         
+        // Find the empty child node to prune
         nodeToPrune = tree.getRoot().getCloserNode().isEmpty() ? tree.getRoot().getCloserNode() : tree.getRoot().getFartherNode();
         tree.pruneEmptyNode(nodeToPrune);
         
+        // The root node should now be a leaf node that contains the points from
+        // the non-empty child
         assertFalse(tree.getRoot().isEmpty());
         assertTrue(tree.getRoot().isLeafNode());
         assertEquals(1, tree.size());

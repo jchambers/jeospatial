@@ -30,11 +30,11 @@ public abstract class GeospatialPointDatabaseTest {
         GeospatialPointDatabaseTest.cities.put("Detroit", new SimpleGeospatialPoint(42.348937, -83.08994));
     }
     
-    public abstract GeospatialPointDatabase<SimpleGeospatialPoint> getDatabase();
+    public abstract GeospatialPointDatabase<SimpleGeospatialPoint> createEmptyDatabase();
     
     @Test
     public void testGetNearestNeighborGeospatialPoint() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
@@ -44,7 +44,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testGetNearestNeighborGeospatialPointDouble() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
@@ -55,7 +55,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testGetNearestNeighborGeospatialPointSearchCriteria() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
@@ -72,7 +72,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testGetNearestNeighborGeospatialPointDoubleSearchCriteria() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
@@ -90,7 +90,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testGetNearestNeighborsGeospatialPointInt() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
@@ -107,7 +107,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testGetNearestNeighborsGeospatialPointIntSearchCriteriaOfE() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         SearchCriteria<SimpleGeospatialPoint> criteria = new SearchCriteria<SimpleGeospatialPoint>() {
@@ -134,7 +134,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testGetNearestNeighborsGeospatialPointIntDouble() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
@@ -157,7 +157,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testGetNearestNeighborsGeospatialPointIntDoubleSearchCriteriaOfE() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         SearchCriteria<SimpleGeospatialPoint> criteria = new SearchCriteria<SimpleGeospatialPoint>() {
@@ -182,7 +182,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testGetAllNeighborsWithinDistanceGeospatialPointDouble() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
@@ -205,7 +205,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testGetAllNeighborsWithinDistanceGeospatialPointDoubleSearchCriteriaOfE() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         SearchCriteria<SimpleGeospatialPoint> criteria = new SearchCriteria<SimpleGeospatialPoint>() {
@@ -233,7 +233,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testMovePointEDoubleDouble() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
@@ -266,7 +266,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testMovePointEGeospatialPoint() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
@@ -300,7 +300,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testIterator() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         assertTrue(database.isEmpty());
         
         Iterator<SimpleGeospatialPoint> i = database.iterator();
@@ -328,7 +328,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testSize() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         assertTrue(database.isEmpty());
         assertEquals(0, database.size());
         
@@ -339,7 +339,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testIsEmpty() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         
         SimpleGeospatialPoint boston = GeospatialPointDatabaseTest.cities.get("Boston");
         
@@ -352,7 +352,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testContains() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         
         SimpleGeospatialPoint boston = GeospatialPointDatabaseTest.cities.get("Boston");
         
@@ -365,7 +365,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testToArray() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         Object[] array = database.toArray();
@@ -379,7 +379,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testToArrayTArray() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         SimpleGeospatialPoint[] points = database.toArray(new SimpleGeospatialPoint[0]);
@@ -404,7 +404,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testAdd() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         
         assertTrue(database.isEmpty());
         assertFalse(database.contains(GeospatialPointDatabaseTest.cities.get("Boston")));
@@ -415,7 +415,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testRemove() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         assertTrue(database.remove(GeospatialPointDatabaseTest.cities.get("Boston")));
@@ -426,7 +426,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testContainsAll() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         assertTrue(database.containsAll(GeospatialPointDatabaseTest.cities.values()));
@@ -436,7 +436,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testAddAll() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         
         assertTrue(database.isEmpty());
         
@@ -452,7 +452,7 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testRemoveAll() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         Vector<SimpleGeospatialPoint> citiesToRemove = new Vector<SimpleGeospatialPoint>();
@@ -475,12 +475,23 @@ public abstract class GeospatialPointDatabaseTest {
     
     @Test
     public void testRetainAll() {
-        fail("Not yet implemented");
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
+        database.addAll(GeospatialPointDatabaseTest.cities.values());
+        
+        List<SimpleGeospatialPoint> citiesToRetain =
+            new Vector<SimpleGeospatialPoint>(GeospatialPointDatabaseTest.cities.values());
+        
+        citiesToRetain = citiesToRetain.subList(0, 4);
+        
+        database.retainAll(citiesToRetain);
+        
+        assertEquals(citiesToRetain.size(), database.size());
+        assertTrue(database.containsAll(citiesToRetain));
     }
     
     @Test
     public void testClear() {
-        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.getDatabase();
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         assertFalse(database.isEmpty());

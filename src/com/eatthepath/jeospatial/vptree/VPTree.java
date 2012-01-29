@@ -972,13 +972,27 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
     }
     
     /**
-     * This optional method is not supported by this vp-tree implementation.
+     * Retains only the points in this vp-tree that are contained in the
+     * specified collection. In other words, removes from this tree all of its
+     * points that are not contained in the specified collection.
      * 
-     * @throws UnsupportedOperationException under all circumstances
+     * @param c
+     *            collection containing elements to be retained in this tree
+     * 
+     * @return {@code true} if this tree was modified by calling this method or
+     *         {@code false} otherwise
      */
     @Override
     public boolean retainAll(Collection<?> c) {
-        throw new UnsupportedOperationException("VP-trees do not support the optional retainAll method.");
+        Vector<E> pointsToRemove = new Vector<E>();
+        
+        for(E point : this) {
+            if(!c.contains(point)) {
+                pointsToRemove.add(point);
+            }
+        }
+        
+        return this.removeAll(pointsToRemove);
     }
     
     /**
