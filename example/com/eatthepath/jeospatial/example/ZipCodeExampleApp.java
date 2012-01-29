@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
 import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
+import com.eatthepath.jeospatial.vptree.LockingVPTree;
 import com.eatthepath.jeospatial.vptree.VPTree;
 
 /**
@@ -76,6 +77,19 @@ public class ZipCodeExampleApp {
         for(ZipCode z : zipCodeTree.getNearestNeighbors(anasTacqueria, 10)) {
             System.out.format("\t%.1f meters - %s%n", anasTacqueria.getDistanceTo(z), z);
         }
+        
+        // Let's see how performance compares with a thread-safe locking tree.
+        LockingVPTree<ZipCode> lockingZipCodeTree = new LockingVPTree<ZipCode>(zipCodes, 20);
+        
+        start = System.currentTimeMillis();
+        
+        for(SimpleGeospatialPoint p : testPoints) {
+            lockingZipCodeTree.getNearestNeighbors(p, 10);
+        }
+        
+        end = System.currentTimeMillis();
+        
+        System.out.format("Performed %d locking vp-tree searches in %d milliseconds.%n", testPoints.length, end - start);
         
         // Just to be difficult, let's remove all of the zip codes from states
         // in the northeast and try the search again.
