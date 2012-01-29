@@ -13,15 +13,18 @@ import com.eatthepath.jeospatial.SearchCriteria;
  * subclass that may or may not accept points that are offered to it based on
  * several criteria. {@code SearchResults} instances are always created with a
  * reference to a query point and a prescribed size; when points are offered via
- * the {@link add} or {@link addAll} methods, the {@code SearchResults} instance
- * will accept the point if and only if the following conditions are met:</p>
+ * the {@link SearchResults#add} or {@link SearchResults#addAll} methods, the
+ * {@code SearchResults} instance will accept the point if and only if the
+ * following conditions are met:</p>
  * 
- * <ol> <li>The {@code SearchResults} instance contains fewer points than its
+ * <ol>
+ * <li>The {@code SearchResults} instance contains fewer points than its
  * maximum capacity <em>or</em> the offered point is closer to the query point
- * than the most distant point already in the queue.</li> <li>No maximum
- * distance has been specified or the offered point falls within the maximum
- * allowable distance from the query point.</li> <li>No search criteria have
- * been specified or the offered point meets the given search criteria.</li>
+ * than the most distant point already in the queue.</li>
+ * <li>No maximum distance has been specified or the offered point falls within
+ * the maximum allowable distance from the query point.</li>
+ * <li>No search criteria have been specified or the offered point meets the
+ * given search criteria.</li>
  * </ol>
  * 
  * <p>@{code SearchResults} objects use an internal reverse geospatial distance
