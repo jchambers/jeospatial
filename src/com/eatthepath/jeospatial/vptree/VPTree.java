@@ -52,6 +52,14 @@ import com.eatthepath.jeospatial.util.SearchResults;
  * <p>The default node capacity for a vp-tree is {@value DEFAULT_BIN_SIZE}
  * points.</p>
  * 
+ * <p>Note that the {@code VPTree} class is <strong>not</strong> thread-safe;
+ * because they forego any kind of synchronization or locking, {@code VPTree}
+ * instances can achieve slightly higher search throughput than their
+ * thread-safe counterparts. This makes the {@code VPTree} class a good choice
+ * for single-threaded applications or applications where the tree will not be
+ * modified after construction. For a thread-safe alternative, use the
+ * {@link LockingVPTree} class.</p>
+ * 
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  * 
  * @see <a href="http://pnylab.com/pny/papers/vptree/main.html">Yianilos, Peter
@@ -829,7 +837,11 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         }
     }
     
+    /**
+     * The default node capacity ({@value} points) for nodes in this tree.
+     */
     public static final int DEFAULT_BIN_SIZE = 32;
+    
     private final int binSize;
     
     private VPNode<E> root;
