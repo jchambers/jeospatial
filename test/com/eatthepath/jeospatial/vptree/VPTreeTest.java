@@ -22,7 +22,7 @@ public class VPTreeTest extends GeospatialPointDatabaseTest {
      */
     @Override
     public GeospatialPointDatabase<SimpleGeospatialPoint> createEmptyDatabase() {
-        return new VPTree<SimpleGeospatialPoint>();
+        return new VPTree<SimpleGeospatialPoint>(2);
     }
     
     @Test
