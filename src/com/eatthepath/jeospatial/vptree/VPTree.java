@@ -34,7 +34,11 @@ import com.eatthepath.jeospatial.util.SearchResults;
  * 
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  * 
- * @see <a href="http://pnylab.com/pny/papers/vptree/main.html">Peter N. Yianilos' original paper on vp-trees</a>
+ * @see <a href="http://pnylab.com/pny/papers/vptree/main.html">Yianilos, Peter
+ *      N.
+ *      "Data Structures and Algorithms for Nearest Neighbor Search in General Metric Spaces".
+ *      Proceedings of the Fifth Annual ACM-SIAM Symposium on Discrete
+ *      Algorithms (SODA). 1993.</a>
  */
 public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabase<E> {
     protected class VPNode<T extends GeospatialPoint> {
