@@ -10,16 +10,18 @@ Geospatial point databases in this library are implemented using [vantage point 
 
 Let's say we have a list of all of the zip codes in the United States and we want to find the ten closest zip codes to some point in the world (let's say [Davis Square in Somerville, MA, USA](http://maps.google.com/maps?q=Davis+Square,+Somerville,+MA&hl=en&sll=42.39358,-71.116902&sspn=0.010824,0.017509&oq=Davis+Square,+Somer&t=w&hnear=Davis+Square,+Somerville,+Middlesex,+Massachusetts&z=15)). We might do something like this:
 
-	// Load a bunch of zip codes from a file and construct a vp-tree from
-	// those points
-	List<ZipCode> zipCodes = ZipCode.loadAllFromCsvFile();
-	VPTree<ZipCode> pointDatabase = new VPTree<ZipCode>(zipCodes);
+```java
+// Load a bunch of zip codes from a file and construct a vp-tree from
+// those points
+List<ZipCode> zipCodes = ZipCode.loadAllFromCsvFile();
+VPTree<ZipCode> pointDatabase = new VPTree<ZipCode>(zipCodes);
 
-	// Pick a query point (Davis Square in Somerville, MA, USA)
-	SimpleGeospatialPoint davisSquare = new SimpleGeospatialPoint(42.396745, -71.122479);
+// Pick a query point (Davis Square in Somerville, MA, USA)
+SimpleGeospatialPoint davisSquare = new SimpleGeospatialPoint(42.396745, -71.122479);
 
-	// Find the ten nearest zip codes to Davis Square
-	List<ZipCode> nearestZipCodes = pointDatabase.getNearestNeighbors(davisSquare, 10);
+// Find the ten nearest zip codes to Davis Square
+List<ZipCode> nearestZipCodes = pointDatabase.getNearestNeighbors(davisSquare, 10);
+```
 
 The `nearestZipCodes` list will have ten elements; the first will be the closest zip code to Davis Square, the second will be the second closest, and so on.
 
@@ -27,8 +29,10 @@ The `nearestZipCodes` list will have ten elements; the first will be the closest
 
 Assuming we have the same set of zip codes, we might want to find all of the zip codes that are within a fixed distance Davis Square. For example:
 
-	// Find all zip codes within ten kilometers of Davis Square
-	List<ZipCode> zipCodesWithinRange = database.getAllNeighborsWithinDistance(davisSquare, 10 * 1000);
+```java
+// Find all zip codes within ten kilometers of Davis Square
+List<ZipCode> zipCodesWithinRange = database.getAllNeighborsWithinDistance(davisSquare, 10 * 1000);
+```
 
 The `zipCodesWithinRange` list will contain all of the zip codes -- sorted in order of increasing distance from Davis Square -- that are within ten kilometers of Davis Square.
 
@@ -36,18 +40,20 @@ The `zipCodesWithinRange` list will contain all of the zip codes -- sorted in or
 
 Assuming we still have the now-familiar list of zip codes, we might want to find the closest zip codes to Davis Square that are outside of the state of Massachusetts. We could do that using the `SearchCriteria` class:
 
-	// Specify search criteria that matches anything outside of the state of
-	// Massachusetts
-	SearchCriteria<ZipCode> searchCriteria = new SearchCriteria<ZipCode>() {
-	    @Override
-	    public boolean matches(ZipCode zipCode) {
-	        return !zipCode.getState().equals("MA");
-	    }
-	};
+```java
+// Specify search criteria that matches anything outside of the state of
+// Massachusetts
+SearchCriteria<ZipCode> searchCriteria = new SearchCriteria<ZipCode>() {
+    @Override
+    public boolean matches(ZipCode zipCode) {
+        return !zipCode.getState().equals("MA");
+    }
+};
 
-	// Find the ten closest zip codes to Davis Square that are outside of
-	// Massachusetts
-	List<ZipCode> closestOutsideMA = database.getNearestNeighbors(davisSquare, 10, searchCriteria);
+// Find the ten closest zip codes to Davis Square that are outside of
+// Massachusetts
+List<ZipCode> closestOutsideMA = database.getNearestNeighbors(davisSquare, 10, searchCriteria);
+```
 
 The `closestOutsideMA` list will contain the ten closest zip codes to Davis Square sorted in order of increasing distance.
 
