@@ -11,7 +11,12 @@ import org.junit.Test;
  * 
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  */
-public class CachingGeospatialPointTest {
+public class CachingGeospatialPointTest extends GeospatialPointTest {
+    @Override
+    public GeospatialPoint getPoint(double latitude, double longitude) {
+        return new CachingGeospatialPoint(latitude, longitude);
+    }
+
     @Test
     public void testCachingGeospatialPointDoubleDouble() {
         CachingGeospatialPoint p = new CachingGeospatialPoint(10, 20);
@@ -28,45 +33,27 @@ public class CachingGeospatialPointTest {
         assertNotSame(a, b);
         assertEquals(a, b);
         
-        assertEquals(10, b.getLatitude(), 0);
-        assertEquals(20, b.getLongitude(), 0);
-    }
-
-    @Test
-    public void testSetLatitude() {
-        CachingGeospatialPoint p = new CachingGeospatialPoint(10, 20);
-        p.setLatitude(30);
-        
-        assertEquals(30, p.getLatitude(), 0);
-    }
-
-    @Test
-    public void testSetLongitude() {
-        CachingGeospatialPoint p = new CachingGeospatialPoint(10, 20);
-        p.setLongitude(30);
-        
-        assertEquals(30, p.getLongitude(), 0);
+        assertEquals(a.getLatitude(), b.getLatitude(), 0);
+        assertEquals(a.getLongitude(), b.getLongitude(), 0);
     }
 
     @Test
     public void testGetDistanceTo() {
-        CachingGeospatialPoint BOS = new CachingGeospatialPoint(42.3631, -71.0064);
-        CachingGeospatialPoint LAX = new CachingGeospatialPoint(33.9425, -118.4072);
+        super.testGetDistanceTo();
         
-        assertEquals("Distance from point to self must be zero.",
-                0, BOS.getDistanceTo(BOS), 0);
+        // In addition to the base tests, we want to make sure that the cached
+        // bits of the distance calculation change when the point moves.
+        SimpleGeospatialPoint BOS = new SimpleGeospatialPoint(42.3631, -71.0064);
+        SimpleGeospatialPoint LAX = new SimpleGeospatialPoint(33.9425, -118.4072);
+        SimpleGeospatialPoint SFO = new SimpleGeospatialPoint(37.6189, -122.3750);
         
-        assertEquals("Distance from A to B must be equal to distance from B to A.",
-                BOS.getDistanceTo(LAX), LAX.getDistanceTo(BOS), 0);
+        CachingGeospatialPoint p = new CachingGeospatialPoint(BOS);
+        assertEquals(BOS.getDistanceTo(LAX), p.getDistanceTo(LAX), 0);
         
-        assertEquals("Distance between BOS and LAX should be within 50km of 4,200km.",
-                4200000, BOS.getDistanceTo(LAX), 50000);
+        p.setLatitude(SFO.getLatitude());
+        p.setLongitude(SFO.getLongitude());
         
-        CachingGeospatialPoint a = new CachingGeospatialPoint(0, 0);
-        CachingGeospatialPoint b = new CachingGeospatialPoint(0, 180);
-        
-        assertEquals("Distance between diametrically opposed points should be within 1m of 20015086m.",
-                20015086, a.getDistanceTo(b), 1d);
+        assertEquals(SFO.getDistanceTo(LAX), p.getDistanceTo(LAX), 0);
     }
     
     /**
@@ -119,14 +106,6 @@ public class CachingGeospatialPointTest {
         
         assertTrue("Caching calculations should be faster than non-caching calculations.",
                 cachingTime < simpleTime);
-    }
-    
-    @Test
-    public void testHashCode() {
-        SimpleGeospatialPoint simplePoint = new SimpleGeospatialPoint(10, 20);
-        CachingGeospatialPoint cachingPoint = new CachingGeospatialPoint(10, 20);
-        
-        assertEquals(simplePoint.hashCode(), cachingPoint.hashCode());
     }
     
     @Test
