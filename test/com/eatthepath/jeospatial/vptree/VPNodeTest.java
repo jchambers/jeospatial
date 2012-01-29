@@ -12,11 +12,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.eatthepath.jeospatial.CachingGeospatialPoint;
 import com.eatthepath.jeospatial.SearchCriteria;
-import com.eatthepath.jeospatial.SimpleGeospatialPoint;
+import com.eatthepath.jeospatial.util.CachingGeospatialPoint;
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
 import com.eatthepath.jeospatial.util.SearchResults;
+import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
 
 /**
  * Test suite for the VPNode class.

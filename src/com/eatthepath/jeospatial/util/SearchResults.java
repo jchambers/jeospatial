@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Vector;
 
-import com.eatthepath.jeospatial.CachingGeospatialPoint;
 import com.eatthepath.jeospatial.GeospatialPoint;
 import com.eatthepath.jeospatial.SearchCriteria;
 

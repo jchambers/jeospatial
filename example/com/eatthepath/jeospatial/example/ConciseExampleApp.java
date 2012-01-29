@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.eatthepath.jeospatial.GeospatialPointDatabase;
 import com.eatthepath.jeospatial.SearchCriteria;
-import com.eatthepath.jeospatial.SimpleGeospatialPoint;
+import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
 import com.eatthepath.jeospatial.vptree.VPTree;
 
 /**

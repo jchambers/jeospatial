@@ -6,9 +6,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
+import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
+
 import au.com.bytecode.opencsv.CSVReader;
 
-import com.eatthepath.jeospatial.SimpleGeospatialPoint;
 
 /**
  * <p>A {@code ZipCode} represents a point at the approximate center of a United

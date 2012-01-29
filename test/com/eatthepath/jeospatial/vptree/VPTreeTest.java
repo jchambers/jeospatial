@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import com.eatthepath.jeospatial.GeospatialPointDatabase;
 import com.eatthepath.jeospatial.GeospatialPointDatabaseTest;
-import com.eatthepath.jeospatial.SimpleGeospatialPoint;
+import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
 
 /**
  * Test suite for the VPTree class.

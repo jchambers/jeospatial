@@ -8,7 +8,7 @@ import java.util.Vector;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.eatthepath.jeospatial.SimpleGeospatialPoint;
+import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
 
 /**
  * Test suite for the TreeIterator class.

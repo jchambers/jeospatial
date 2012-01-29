@@ -2,7 +2,6 @@ package com.eatthepath.jeospatial.util;
 
 import java.util.Comparator;
 
-import com.eatthepath.jeospatial.CachingGeospatialPoint;
 import com.eatthepath.jeospatial.GeospatialPoint;
 
 /**

@@ -1,8 +1,11 @@
-package com.eatthepath.jeospatial;
+package com.eatthepath.jeospatial.util;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+
+import com.eatthepath.jeospatial.GeospatialPoint;
+import com.eatthepath.jeospatial.GeospatialPointTest;
 
 /**
  * Test suite for the SimpleGeospatialPoint class.

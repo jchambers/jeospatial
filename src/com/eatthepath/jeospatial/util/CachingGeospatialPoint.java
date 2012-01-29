@@ -1,4 +1,6 @@
-package com.eatthepath.jeospatial;
+package com.eatthepath.jeospatial.util;
+
+import com.eatthepath.jeospatial.GeospatialPoint;
 
 /**
  * <p>A caching geospatial point is an extension of a simple geospatial point

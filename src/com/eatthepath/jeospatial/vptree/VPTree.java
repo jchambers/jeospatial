@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import com.eatthepath.jeospatial.CachingGeospatialPoint;
 import com.eatthepath.jeospatial.GeospatialPoint;
 import com.eatthepath.jeospatial.GeospatialPointDatabase;
 import com.eatthepath.jeospatial.SearchCriteria;
-import com.eatthepath.jeospatial.SimpleGeospatialPoint;
+import com.eatthepath.jeospatial.util.CachingGeospatialPoint;
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
 import com.eatthepath.jeospatial.util.SearchResults;
+import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
 
 /**
  * <p>A geospatial database that uses a vantage point tree as its storage

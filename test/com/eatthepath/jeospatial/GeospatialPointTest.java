@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
+
 /**
  * Abstract test suite for classes implementing the GeospatialPoint interface.
  * 

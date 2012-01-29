@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
-import com.eatthepath.jeospatial.SimpleGeospatialPoint;
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
+import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
 import com.eatthepath.jeospatial.vptree.VPTree;
 
 /**

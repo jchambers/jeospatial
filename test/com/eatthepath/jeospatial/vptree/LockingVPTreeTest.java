@@ -10,9 +10,9 @@ import org.junit.Test;
 import com.eatthepath.jeospatial.GeospatialPoint;
 import com.eatthepath.jeospatial.GeospatialPointDatabase;
 import com.eatthepath.jeospatial.GeospatialPointDatabaseTest;
-import com.eatthepath.jeospatial.SimpleGeospatialPoint;
 import com.eatthepath.jeospatial.example.ZipCode;
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
+import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
 
 /**
  * Test suite for the {@link LockingVPTree} class.

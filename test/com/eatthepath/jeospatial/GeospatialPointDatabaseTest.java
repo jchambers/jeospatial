@@ -11,6 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
+import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
 
 public abstract class GeospatialPointDatabaseTest {
     protected static Hashtable<String, SimpleGeospatialPoint> cities;

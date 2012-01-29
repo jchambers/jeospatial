@@ -10,9 +10,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.eatthepath.jeospatial.CachingGeospatialPoint;
 import com.eatthepath.jeospatial.SearchCriteria;
-import com.eatthepath.jeospatial.SimpleGeospatialPoint;
 
 public class SearchResultsTest {
     private static Hashtable<String, SimpleGeospatialPoint> cities;

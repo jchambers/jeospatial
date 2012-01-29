@@ -1,4 +1,6 @@
-package com.eatthepath.jeospatial;
+package com.eatthepath.jeospatial.util;
+
+import com.eatthepath.jeospatial.GeospatialPoint;
 
 /**
  * <p>A simple geospatial point implementation. Simple geospatial points
