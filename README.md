@@ -12,6 +12,8 @@ The `GeospatialPoint` interface defines a single point on the earth's surface; c
 
 The `GeospatialPointDatabase` interface defines the behavioral contract for classes that index collections of `GeospatialPoints` and provide facilities for performing nearest-neighbor searches among those points. The `VPTree` and `LockingVPTree` classes are both concrete implementations of the `GeospatialPointDatabase` class and can be found in the `com.eatthepath.jeospatial.vptree` package.
 
+For additional details, see the [API documentation](http://jchambers.github.com/jeospatial/javadoc).
+
 ## Examples
 
 ### Finding nearest neighbors
