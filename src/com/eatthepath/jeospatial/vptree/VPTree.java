@@ -1074,7 +1074,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
      * @param nodesToPrune
      *            a {@code Set} to be populated with nodes left empty by the
      *            removal of points; this may be {@code null} if
-     *            {@code deferPruning} if {@code false}
+     *            {@code deferPruning} is {@code false}
      *            
      * @return {@code true} if the tree was modified by removing this point
      *         (i.e. if the point was present in the tree) or {@code false}
