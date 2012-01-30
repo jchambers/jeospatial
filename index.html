@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>jeospatial</title>
+		
+		<script type="text/javascript" src="./syntax-highlighter/js/shCore.js"></script>
+		<script type="text/javascript" src="./syntax-highlighter/js/shBrushJava.js"></script>
+		
+		<link type="text/css" rel="stylesheet" href="./syntax-highlighter/css/shCoreDefault.css"/>
+		
+		<link rel="stylesheet" type="text/css" href="./style.css"/>
+		
+		<script type="text/javascript">SyntaxHighlighter.all();</script>
+	</head>
+	
+	<body>
+		<p id="links"><a href="./javadoc">Javadoc (API Specification)</a> | <a href="https://github.com/jchambers/jeospatial">GitHub Project</a></p>
+		
+		<h1>jeospatial</h1>
+
+		<p>Jeospatial is a simple geospatial point database library for Java. It aims to provide an easy-to-use and reasonably-high-performance set of tools for solving the <span class="italic">k</span>-nearest-neighbor problem on the earth's surface.</p>
+
+		<p>Geospatial point databases in this library are implemented using <a href="http://pnylab.com/pny/papers/vptree/main.html">vantage point trees</a> (or vp-trees), which are a data structure that performs binary space partitioning on a metric space. Construction of a vp-tree executes in <span class="math">O(n log(n))</span> time and searches against the tree execute in <span class="math">O(log(n))</span> time. As a practical point of reference, it takes about two seconds to construct a vp-tree that contains roughly 30,000 geospatial points on a 2007 MacBook Pro, and about two seconds to execute 10,000 searches against that tree (for a search throughput of about 5,000 searches/second). By contrast, it takes between 300 and 400 milliseconds to sort a list of those 30,000 points by distance from a query point (for a search throughput of 2-3 searches/second).</p>
+
+		<h2>Major concepts</h2>
+
+		<p>The two most important interfaces in the jeospatial library are in the <a href="./javadoc/com/eatthepath/jeospatial/package-summary.html" class="code">com.eatthepath.jeospatial</a> package.</p>
+
+		<p>The <a href="./javadoc/com/eatthepath/jeospatial/GeospatialPoint.html" class="code">GeospatialPoint</a> interface defines a single point on the earth's surface; concrete implementations of the <a href="./javadoc/com/eatthepath/jeospatial/GeospatialPoint.html" class="code">GeospatialPoint</a> interface can be found in the <a href="./javadoc/com/eatthepath/jeospatial/util/package-frame.html" class="code">com.eatthepath.jeospatial.util</a> package.</p>
+
+		<p>The <a href="./javadoc/com/eatthepath/jeospatial/GeospatialPointDatabase.html" class="code">GeospatialPointDatabase</a> interface defines the behavioral contract for classes that index collections of <a href="./javadoc/com/eatthepath/jeospatial/GeospatialPoint.html" class="code">GeospatialPoints</a> and provide facilities for performing nearest-neighbor searches among those points. The <a href="./javadoc/com/eatthepath/jeospatial/vptree/VPTree.html" class="code">VPTree</a> and <a href="./javadoc/com/eatthepath/jeospatial/vptree/LockingVPTree.html" class="code">LockingVPTree</a> classes are both concrete implementations of the <a href="./javadoc/com/eatthepath/jeospatial/GeospatialPointDatabase.html" class="code">GeospatialPointDatabase</a> class and can be found in the <a href="./javadoc/com/eatthepath/jeospatial/vptree/package-frame.html" class="code">com.eatthepath.jeospatial.vptree</a> package.</p>
+
+		<h2>Examples</h2>
+
+		<h3>Finding nearest neighbors</h3>
+
+		<p>Let's say we have a list of all of the zip codes in the United States and we want to find the ten closest zip codes to some point in the world (let's say <a href="http://maps.google.com/maps?q=Davis+Square,+Somerville,+MA&hl=en&sll=42.39358,-71.116902&sspn=0.010824,0.017509&oq=Davis+Square,+Somer&t=w&hnear=Davis+Square,+Somerville,+Middlesex,+Massachusetts&z=15">Davis Square in Somerville, MA, USA</a>). We might do something like this:</p>
+
+		<pre class="brush: java;">// Load a bunch of zip codes from a file and construct a vp-tree from
+// those points
+List&lt;ZipCode&gt; zipCodes = ZipCode.loadAllFromCsvFile();
+VPTree&lt;ZipCode&gt; pointDatabase = new VPTree&lt;ZipCode&gt;(zipCodes);
+
+// Pick a query point (Davis Square in Somerville, MA, USA)
+SimpleGeospatialPoint davisSquare = new SimpleGeospatialPoint(42.396745, -71.122479);
+
+// Find the ten nearest zip codes to Davis Square
+List&lt;ZipCode&gt; nearestZipCodes = pointDatabase.getNearestNeighbors(davisSquare, 10);</pre>
+
+		<p>The <span class="code">nearestZipCodes</span> list will have ten elements; the first will be the closest zip code to Davis Square, the second will be the second closest, and so on.</p>
+
+		<h3>Finding all neighbors within a certain radius</h3>
+
+		<p>Assuming we have the same set of zip codes, we might want to find all of the zip codes that are within a fixed distance Davis Square. For example:</p>
+
+		<pre class="brush: java;">// Find all zip codes within ten kilometers of Davis Square
+List&lt;ZipCode&gt; zipCodesWithinRange = database.getAllNeighborsWithinDistance(davisSquare, 10 * 1000);</pre>
+
+		<p>The <span class="code">zipCodesWithinRange</span> list will contain all of the zip codes -- sorted in order of increasing distance from Davis Square -- that are within ten kilometers of Davis Square.</p>
+
+		<h3>Finding neighbors by other search criteria</h3>
+
+		<p>Assuming we still have the now-familiar list of zip codes, we might want to find the closest zip codes to Davis Square that are outside of the state of Massachusetts. We could do that using the <span class="code">SearchCriteria</span> class:</p>
+
+		<pre class="brush: java;">// Specify search criteria that matches anything outside of the state of
+// Massachusetts
+SearchCriteria&lt;ZipCode&gt; searchCriteria = new SearchCriteria&lt;ZipCode&gt;() {
+    @Override
+    public boolean matches(ZipCode zipCode) {
+        return !zipCode.getState().equals("MA");
+    }
+};
+
+// Find the ten closest zip codes to Davis Square that are outside of
+// Massachusetts
+List&lt;ZipCode&gt; closestOutsideMA = database.getNearestNeighbors(davisSquare, 10, searchCriteria);</pre>
+
+		<p>The <span class="code">closestOutsideMA</span> list will contain the ten closest zip codes to Davis Square sorted in order of increasing distance.</p>
+
+		<h2>Acknowledgements</h2>
+
+		<a href="http://www.census.gov/tiger/tms/gazetteer/zips.txt">United States ZIP code data</a> used in examples and unit tests comes from <a href="http://www.census.gov/">The United States Census Bureau</a>. Examples and unit tests make use of the <a href="http://opencsv.sourceforge.net/">opencsv</a> library under the <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version&nbsp;2.0</a>.
+
+		<h2>License</h2>
+
+		<p>jeospatial is an open-source project provided under the <a href="http://www.opensource.org/licenses/bsd-license.php">BSD License</a>.</p>
+	</body>
+</html>
