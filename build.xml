@@ -1,32 +1,50 @@
 <project name="jeospatial" basedir="." default="dist">
 	<property name="src" location="src"/>
 	<property name="src.test" location="test"/>
+	<property name="src.example" location="example"/>
 	
 	<property name="doc" location="doc"/>
 	<property name="doc.javadoc" location="${doc}/javadoc"/>
+	<property name="doc.test" location="${doc}/test-reports"/>
 	
 	<property name="build" location="build"/>
 	<property name="build.test" location="build-test"/>
+	<property name="build.example" location="build-example"/>
+	
+	<property name="lib" location="lib"/>
+	<property name="lib.junit" location="./junit-4.10.jar"/>
+	<property name="lib.opencsv" location="${lib}/opencsv-2.3.jar"/>
 	
 	<property name="distfile" location="jeospatial.jar"/>
-	
-	<property name="junit.location" location="./junit-4.10.jar"/>
 	
 	<target name="init">
 		<mkdir dir="${build}"/>
 		<mkdir dir="${build.test}"/>
+		<mkdir dir="${build.example}"/>
 		<mkdir dir="${doc}"/>
 		<mkdir dir="${doc.javadoc}"/>
+		<mkdir dir="${doc.test}"/>
 	</target>
 	
 	<target name="build" depends="init">
 		<javac includeantruntime="false" srcdir="${src}" destdir="${build}"/>
 	</target>
 	
-	<target name="test-build" depends="build">
+	<target name="example-build" depends="build">
+		<javac includeantruntime="false" srcdir="${src.example}" destdir="${build.example}">
+			<classpath>
+				<pathelement path="${build}"/>
+				<pathelement path="${lib.opencsv}"/>
+			</classpath>
+		</javac>
+	</target>
+	
+	<target name="test-build" depends="build, example-build">
 		<javac includeantruntime="false" srcdir="${src.test}" destdir="${build.test}">
 			<classpath>
-				<pathelement path="${junit.location}"/>
+				<pathelement path="${lib.junit}"/>
+				<pathelement path="${lib.opencsv}"/>
+				<pathelement path="${build.example}"/>
 				<pathelement path="${build}"/>
 			</classpath>
 		</javac>
@@ -35,15 +53,33 @@
 	<target name="test" depends="test-build">
 		<junit printsummary="on">
 			<classpath>
-				<pathelement path="${junit.location}"/>
+				<pathelement path="${lib.junit}"/>
+				<pathelement path="${lib.opencsv}"/>
 				<pathelement path="${build}"/>
+				<pathelement path="${build.example}"/>
 				<pathelement path="${build.test}"/>
 			</classpath>
 			
-			<batchtest>
-				<fileset dir="${build.test}"/>
+			<formatter type="xml"/>
+			
+			<batchtest todir="${doc.test}">
+				<fileset dir="${src.test}">
+					<!-- Manually exclude abstract test cases -->
+					<exclude name="**/GeospatialPointDatabaseTest.java"/>
+					<exclude name="**/GeospatialPointTest.java"/>
+				</fileset>
 			</batchtest>
 		</junit>
+		
+		<junitreport todir="${doc.test}">
+			<fileset dir="${doc.test}" includes="TEST-*.xml"/>
+			<report todir="${doc.test}"/>
+		</junitreport>
+		
+		<!-- Clean up intermediate xml files -->
+		<delete>
+			<fileset dir="${doc.test}" includes="*.xml"/>
+		</delete>
 	</target>
 	
 	<target name="doc">
@@ -62,6 +98,7 @@
 	<target name="clean">
 		<delete dir="${build}"/>
 		<delete dir="${build.test}"/>
+		<delete dir="${build.example}"/>
 		<delete dir="${doc}"/>
 		
 		<delete file="${distfile}"/>
