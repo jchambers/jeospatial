@@ -9,7 +9,7 @@ import com.eatthepath.jeospatial.GeospatialPoint;
 import com.eatthepath.jeospatial.SearchCriteria;
 
 /**
- * <p>The @{code SearchResults} class is a fixed-size {@link PriorityQueue}
+ * <p>The {@code SearchResults} class is a fixed-size {@link PriorityQueue}
  * subclass that may or may not accept points that are offered to it based on
  * several criteria. {@code SearchResults} instances are always created with a
  * reference to a query point and a prescribed size; when points are offered via
@@ -27,7 +27,7 @@ import com.eatthepath.jeospatial.SearchCriteria;
  * given search criteria.</li>
  * </ol>
  * 
- * <p>@{code SearchResults} objects use an internal reverse geospatial distance
+ * <p>{@code SearchResults} objects use an internal reverse geospatial distance
  * comparator; this ensures that the point at the head of the queue is always
  * the most distant point from the query point.</p>
  * 

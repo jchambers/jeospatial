@@ -1021,9 +1021,9 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
     }
     
     /**
-     * Returns an @{code Iterator} over all of the points contained in this
-     * tree. The order of iteration is not defined, and the @{code Iterator}
-     * returned by this method does not support the optional @{code remove}
+     * Returns an {@code Iterator} over all of the points contained in this
+     * tree. The order of iteration is not defined, and the {@code Iterator}
+     * returned by this method does not support the optional {@code remove}
      * method. The behavior of the returned {@code Iterator} is not defined if
      * the tree is modified after the {@code Iterator} is returned.
      * 
@@ -1072,7 +1072,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
      *            time chosen by the caller; otherwise, empty nodes are pruned
      *            immediately
      * @param nodesToPrune
-     *            a @{code Set} to be populated with nodes left empty by the
+     *            a {@code Set} to be populated with nodes left empty by the
      *            removal of points; this may be {@code null} if
      *            {@code deferPruning} if {@code false}
      *            

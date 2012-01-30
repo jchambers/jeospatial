@@ -9,7 +9,7 @@ import com.eatthepath.jeospatial.GeospatialPoint;
  * identically to simple geospatial points. Internally, caching geospatial
  * points pre-calculate parts of the spherical distance calculation. This uses
  * more memory, but reduces the number of trigonometric calculations that need
- * to be made in repeated calls to the @{code getDistanceTo} method.</p>
+ * to be made in repeated calls to the {@code getDistanceTo} method.</p>
  * 
  * <p>Caching geospatial points are a good choice in cases where one point will
  * be the origin in distance calculations to lots of other points. Caching
