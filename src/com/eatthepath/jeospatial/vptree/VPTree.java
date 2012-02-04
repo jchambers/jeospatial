@@ -95,7 +95,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
          */
         public VPNode(int binSize) {
             this.binSize = binSize;
-            this.points = new ArrayList<T>(this.binSize);
+            this.points = new ArrayList<T>(0);
             
             this.center = null;
         }
@@ -208,22 +208,30 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
          *            children
          * 
          * @return {@code true} if this node or its children were modified or
-         *         {@code false} otherwise
+         *         {@code false} otherwise; vp-trees are always modified by the
+         *         addition of points, so this method always returns
+         *         {@code true} if {@code points} is not empty
          */
         public boolean addAll(Collection<? extends T> points) {
-            HashSet<VPNode<T>> nodesToPartition = new HashSet<VPNode<T>>();
+            HashSet<VPNode<T>> nodesAffected = new HashSet<VPNode<T>>();
             
             for(T point : points) {
-                this.add(point, true, nodesToPartition);
+                this.add(point, true, nodesAffected);
             }
             
-            // Resolve all of the deferred partitioning
-            for(VPNode<T> node : nodesToPartition) {
-                try {
-                    node.partition();
-                } catch(PartitionException e) {
-                    // Nothing to do here; this just means some nodes are bigger
-                    // than they want to be.
+            // Resolve all of the deferred maintenance
+            for(VPNode<T> node : nodesAffected) {
+                if(node.isOverloaded()) {
+                    try {
+                        node.partition();
+                    } catch (PartitionException e) {
+                        // Nothing to do here; this just means some nodes are
+                        // bigger than they want to be.
+                    }
+                } else {
+                    // We don't need to partition the node, but we may need to
+                    // trim it.
+                    node.points.trimToSize();
                 }
             }
             
@@ -257,37 +265,42 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
          * 
          * @param point
          *            the point to add to this node or one of its children
-         * @param deferPartitioning
+         * @param deferMaintenance
          *            if {@code true}, defer partitioning of overloaded nodes
-         *            until the caller chooses to partition them; if
-         *            {@code false}, overloaded nodes are partitioned
-         *            immediately
-         * @param nodesToPartition
-         *            a {@code Set} that collects overloaded nodes in need of
-         *            deferred partitioning; this may be {@code null} if
-         *            {@code deferPartitioning} is {@code false}; callers must
-         *            use this set to partition nodes later
+         *            and trimming of nodes with spare capacity until the caller
+         *            chooses to partition or trim them; if {@code false},
+         *            overloaded nodes are partitioned or trimmed immediately
+         * @param nodesAffected
+         *            a {@code Set} that collects nodes that have received new
+         *            points; this may be {@code null} if
+         *            {@code deferMaintenance} is {@code false}. Callers must
+         *            use this set to partition or trim nodes later.
          * 
          * @return {@code true} if this node or any of its children were
          *         modified by the addition of the new point or {@code false}
          *         otherwise; note that adding points always results in
          *         modification
          */
-        protected boolean add(T point, boolean deferPartitioning, Set<VPNode<T>> nodesToPartition) {
+        protected boolean add(T point, boolean deferMaintenance, Set<VPNode<T>> nodesAffected) {
             if(this.isLeafNode()) {
                 this.points.add(point);
                 
-                // Should we try to repartition?
-                if(this.points.size() > this.binSize) {
-                    if(deferPartitioning) {
-                        nodesToPartition.add(this);
-                    } else {
+                if(deferMaintenance) {
+                    // We'll decide how to maintain this node later
+                    nodesAffected.add(this);
+                } else {
+                    if(this.isOverloaded()) {
                         try {
                             this.partition();
                         } catch(PartitionException e) {
                             // Nothing to do here; just hold on to all of our
                             // points.
-                        }
+                        }                        
+                    } else {
+                        // If we didn't need to partition, we may have some
+                        // excess storage capacity. Trim our internal point
+                        // store to keep memory overhead to a minimum.
+                        this.points.trimToSize();
                     }
                 }
             } else {
@@ -352,7 +365,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
          *            store
          */
         private void storePoints(T[] points, int fromIndex, int toIndex) {
-            this.points = new ArrayList<T>(this.binSize);
+            this.points = new ArrayList<T>(toIndex - fromIndex);
             
             for(int i = fromIndex; i < toIndex; i++) {
                 this.points.add(points[i]);
@@ -764,7 +777,11 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
          */
         public boolean remove(T point) {
             if(this.isLeafNode()) {
-                return this.points.remove(point);
+                boolean pointRemoved = this.points.remove(point);
+                
+                if(pointRemoved) { this.points.trimToSize(); }
+                
+                return pointRemoved;
             } else {
                 throw new IllegalStateException("Cannot remove points from a non-leaf node.");
             }
@@ -782,7 +799,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
                 throw new IllegalStateException("Leaf nodes have no children.");
             }
             
-            this.points = new ArrayList<T>(this.binSize);
+            this.points = new ArrayList<T>(this.size());
             
             if(!this.closer.isLeafNode()) {
                 this.closer.absorbChildren();
