@@ -59,8 +59,8 @@ public class LoadTestApp {
         Random r = new Random();
         
         for(int i = 0; i < testPoints.length; i++) {
-            double latitude = -70d - (r.nextDouble() * 50d);
-            double longitude = 28d + (r.nextDouble() * 14d);
+            double longitude = -70d - (r.nextDouble() * 50d);
+            double latitude = 28d + (r.nextDouble() * 14d);
             
             testPoints[i] = new SimpleGeospatialPoint(latitude, longitude);
         }
