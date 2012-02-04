@@ -92,6 +92,15 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 		return angle * GeospatialPoint.EARTH_RADIUS;
 	}
 	
+	/**
+	 * Returns the haversine of the given angle.
+	 * 
+	 * @param theta the angle, in radians, for which to calculate the haversine
+	 * 
+	 * @return the haversine of the given angle
+	 * 
+	 * @see http://en.wikipedia.org/wiki/Versine
+	 */
 	private double haversine(double theta) {
 	    double x = Math.sin(theta / 2);
 	    
