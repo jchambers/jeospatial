@@ -1,4 +1,4 @@
-package com.eatthepath.jeospatial.example;
+package com.eatthepath.jeospatial;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,18 +6,20 @@ import java.util.List;
 import java.util.Random;
 import java.util.ArrayList;
 
+import com.eatthepath.jeospatial.example.ZipCode;
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
 import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
 import com.eatthepath.jeospatial.vptree.LockingVPTree;
 import com.eatthepath.jeospatial.vptree.VPTree;
 
 /**
- * A crude demonstration app that loads a bunch of zip codes, builds a vp-tree
- * and performs some searches.
+ * A crude test app that loads a bunch of zip codes, builds a vp-tree and
+ * performs some searches. The point here is to use a dataset that's larger
+ * than would be practical to use during normal unit tests.
  * 
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  */
-public class ZipCodeExampleApp {
+public class LoadTestApp {
     public static void main(String[] args) throws IOException {
         long start = System.currentTimeMillis();
         List<ZipCode> zipCodes = ZipCode.loadAllFromCsvFile(new File("data/zips.csv"));
@@ -30,7 +32,7 @@ public class ZipCodeExampleApp {
         VPTree<ZipCode> zipCodeTree = new VPTree<ZipCode>(zipCodes, 20);
         end = System.currentTimeMillis();
         
-        System.out.format("Build vp-tree from zip code list in %d milliseconds.%n", end - start);
+        System.out.format("Built vp-tree from zip code list in %d milliseconds.%n", end - start);
         
         // Now let's compare search performance! We'll start by picking a query
         // point which, for lack of a better idea, will be the position of the
@@ -114,7 +116,7 @@ public class ZipCodeExampleApp {
         zipCodeTree.removeAll(zipCodesToRemove);
         end = System.currentTimeMillis();
         
-        System.out.format("Remove %d zip codes in %d milliseconds.%n", zipCodesToRemove.size(), end - start);
+        System.out.format("Removed %d zip codes in %d milliseconds.%n", zipCodesToRemove.size(), end - start);
         
         List<ZipCode> closestAfterRemoval = zipCodeTree.getNearestNeighbors(anasTacqueria, 10);
         
