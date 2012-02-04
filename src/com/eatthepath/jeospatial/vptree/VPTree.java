@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import com.eatthepath.jeospatial.GeospatialPoint;
 import com.eatthepath.jeospatial.GeospatialPointDatabase;
 import com.eatthepath.jeospatial.SearchCriteria;
-import com.eatthepath.jeospatial.util.CachingGeospatialPoint;
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
 import com.eatthepath.jeospatial.util.SearchResults;
 import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
@@ -79,7 +78,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
      * points of their own.</p>
      */
     protected class VPNode<T extends GeospatialPoint> {
-        private CachingGeospatialPoint center;
+        private SimpleGeospatialPoint center;
         private double threshold;
         
         private VPNode<T> closer;
@@ -373,7 +372,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             
             // Always choose a center point if we don't already have one
             if(this.center == null && !this.points.isEmpty()) {
-                this.center = new CachingGeospatialPoint(this.points.get(0));
+                this.center = new SimpleGeospatialPoint(this.points.get(0));
             }
             
             this.closer = null;
@@ -456,7 +455,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             // median distance from our center to points in our set is a safe
             // bet.
             if(this.center == null) {
-                this.center = new CachingGeospatialPoint(points[fromIndex]);
+                this.center = new SimpleGeospatialPoint(points[fromIndex]);
             }
 
             // TODO Consider optimizing this whole approach to partitioning
@@ -661,7 +660,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
          * @param results
          *            the {@code ArrayList} to populate
          */
-        public void getAllWithinRange(final CachingGeospatialPoint queryPoint, final double maxDistance, final SearchCriteria<T> criteria, final ArrayList<T> results) {
+        public void getAllWithinRange(final SimpleGeospatialPoint queryPoint, final double maxDistance, final SearchCriteria<T> criteria, final ArrayList<T> results) {
             // If this is a leaf node, just add all of our points to the list if
             // they fall within range and meet the search criteria (if any).
             if(this.isLeafNode()) {
@@ -1369,7 +1368,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
     @Override
     public List<E> getAllNeighborsWithinDistance(GeospatialPoint queryPoint, double maxDistance, SearchCriteria<E> searchCriteria) {
         ArrayList<E> results = new ArrayList<E>(this.binSize);
-        this.root.getAllWithinRange(new CachingGeospatialPoint(queryPoint), maxDistance, searchCriteria, results);
+        this.root.getAllWithinRange(new SimpleGeospatialPoint(queryPoint), maxDistance, searchCriteria, results);
         
         java.util.Collections.sort(results, new GeospatialDistanceComparator<E>(queryPoint));
         

@@ -4,7 +4,7 @@ import com.eatthepath.jeospatial.GeospatialPoint;
 
 /**
  * <p>A simple geospatial point implementation. Simple geospatial points
- * calculate distance to other points using the spherical law of cosines.</p>
+ * calculate distance to other points using the Haversine Formula.</p>
  * 
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  */
@@ -87,9 +87,15 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 		double lat2 = Math.toRadians(otherPoint.getLatitude());
 		double lon2 = Math.toRadians(otherPoint.getLongitude());
 		
-		double angle = Math.acos((Math.sin(lat1) * Math.sin(lat2)) + (Math.cos(lat1) * Math.cos(lat2) * Math.cos(lon2 - lon1)));
+		double angle = 2 * Math.asin(Math.min(1, Math.sqrt(this.haversine(lat2 - lat1) + Math.cos(lat1) * Math.cos(lat2) * this.haversine(lon2 - lon1))));
 		
-		return Double.isNaN(angle) ? 0 : GeospatialPoint.EARTH_RADIUS * angle;
+		return angle * GeospatialPoint.EARTH_RADIUS;
+	}
+	
+	private double haversine(double theta) {
+	    double x = Math.sin(theta / 2);
+	    
+	    return (x * x);
 	}
 
 	/**

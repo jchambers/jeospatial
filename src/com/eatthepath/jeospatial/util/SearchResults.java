@@ -36,7 +36,7 @@ import com.eatthepath.jeospatial.SearchCriteria;
 public class SearchResults<E extends GeospatialPoint> extends PriorityQueue<E> {
     private static final long serialVersionUID = 1L;
     
-    private final CachingGeospatialPoint queryPoint;
+    private final SimpleGeospatialPoint queryPoint;
     private final int maxSize;
     private final double maxDistance;
     private final SearchCriteria<E> criteria;
@@ -108,7 +108,7 @@ public class SearchResults<E extends GeospatialPoint> extends PriorityQueue<E> {
     public SearchResults(GeospatialPoint queryPoint, int maxSize, double maxDistance, SearchCriteria<E> criteria) {
         super(maxSize, new ReverseComparator<E>(new GeospatialDistanceComparator<E>(queryPoint)));
         
-        this.queryPoint = new CachingGeospatialPoint(queryPoint);
+        this.queryPoint = new SimpleGeospatialPoint(queryPoint);
         this.maxSize = maxSize;
         this.maxDistance = maxDistance;
         this.criteria = criteria;

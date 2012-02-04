@@ -36,7 +36,7 @@ public class SearchResultsTest {
     
     @Test
     public void testAdd() {
-        CachingGeospatialPoint somerville = new CachingGeospatialPoint(42.387597, -71.099497);
+        SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
         
         SearchResults<SimpleGeospatialPoint> results = new SearchResults<SimpleGeospatialPoint>(somerville, 3);
         
@@ -105,7 +105,7 @@ public class SearchResultsTest {
     
     @Test
     public void testAddAll() {
-        CachingGeospatialPoint somerville = new CachingGeospatialPoint(42.387597, -71.099497);
+        SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
         
         SearchResults<SimpleGeospatialPoint> results = new SearchResults<SimpleGeospatialPoint>(somerville, 4);
         results.addAll(SearchResultsTest.cities.values());
@@ -129,7 +129,7 @@ public class SearchResultsTest {
     
     @Test
     public void testGetLongestDistanceFromQueryPoint() {
-        CachingGeospatialPoint somerville = new CachingGeospatialPoint(42.387597, -71.099497);
+        SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
         
         SearchResults<SimpleGeospatialPoint> results =
                 new SearchResults<SimpleGeospatialPoint>(somerville, SearchResultsTest.cities.size());
@@ -142,7 +142,7 @@ public class SearchResultsTest {
     
     @Test
     public void testToSortedList() {
-        CachingGeospatialPoint somerville = new CachingGeospatialPoint(42.387597, -71.099497);
+        SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
         
         SearchResults<SimpleGeospatialPoint> results = new SearchResults<SimpleGeospatialPoint>(somerville, 4);
         results.addAll(SearchResultsTest.cities.values());

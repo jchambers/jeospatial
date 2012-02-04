@@ -11,7 +11,7 @@ import com.eatthepath.jeospatial.GeospatialPoint;
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  */
 public class GeospatialDistanceComparator<T extends GeospatialPoint> implements Comparator<T> {
-	private final CachingGeospatialPoint origin;
+	private final SimpleGeospatialPoint origin;
 	
 	/**
 	 * Constructs a new comparator that sorts geospatial points according to
@@ -21,7 +21,7 @@ public class GeospatialDistanceComparator<T extends GeospatialPoint> implements 
 	 *            the point from which to measure other points
 	 */
 	public GeospatialDistanceComparator(GeospatialPoint origin) {
-		this.origin = new CachingGeospatialPoint(origin);
+		this.origin = new SimpleGeospatialPoint(origin);
 	}
 	
 	/**

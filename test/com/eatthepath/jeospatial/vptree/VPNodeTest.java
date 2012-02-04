@@ -13,7 +13,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.eatthepath.jeospatial.SearchCriteria;
-import com.eatthepath.jeospatial.util.CachingGeospatialPoint;
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
 import com.eatthepath.jeospatial.util.SearchResults;
 import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
@@ -318,7 +317,7 @@ public class VPNodeTest {
     public void testGetNearestNeighbors() {
         this.testNode.addAll(VPNodeTest.cities.values());
         
-        CachingGeospatialPoint somerville = new CachingGeospatialPoint(42.387597, -71.099497);
+        SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
         
         SearchResults<SimpleGeospatialPoint> results = new SearchResults<SimpleGeospatialPoint>(somerville, 3);
         this.testNode.getNearestNeighbors(somerville, results);
@@ -373,7 +372,7 @@ public class VPNodeTest {
     public void testGetAllWithinRange() {
         this.testNode.addAll(VPNodeTest.cities.values());
         
-        CachingGeospatialPoint somerville = new CachingGeospatialPoint(42.387597, -71.099497);
+        SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
         
         ArrayList<SimpleGeospatialPoint> results = new ArrayList<SimpleGeospatialPoint>();
         this.testNode.getAllWithinRange(somerville, 1000 * 1000, null, results);

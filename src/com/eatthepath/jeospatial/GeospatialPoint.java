@@ -16,7 +16,7 @@ public interface GeospatialPoint {
      * 
      * @see GeospatialPoint#getDistanceTo(GeospatialPoint)
      */
-    public static final double EARTH_RADIUS = 6371000; // meters
+    public static final double EARTH_RADIUS = 6371 * 1000; // meters
     
     /**
      * Sets the latitude of this point. Note that, for points in a
