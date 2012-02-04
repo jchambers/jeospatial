@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
 
@@ -122,7 +122,7 @@ public class ZipCode extends SimpleGeospatialPoint {
     public static List<ZipCode> loadAllFromCsvFile(File file) throws IOException {
         CSVReader reader = new CSVReader(new FileReader(file));
         
-        Vector<ZipCode> zipCodes = new Vector<ZipCode>();
+        ArrayList<ZipCode> zipCodes = new ArrayList<ZipCode>();
         
         try {
             String[] row = reader.readNext();

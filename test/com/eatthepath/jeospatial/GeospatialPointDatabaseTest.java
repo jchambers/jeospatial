@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -102,8 +102,8 @@ public abstract class GeospatialPointDatabaseTest {
         SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
         List<SimpleGeospatialPoint> nearestNeighbors = database.getNearestNeighbors(somerville, 4);
         
-        Vector<SimpleGeospatialPoint> expectedResults =
-                new Vector<SimpleGeospatialPoint>(GeospatialPointDatabaseTest.cities.values());
+        ArrayList<SimpleGeospatialPoint> expectedResults =
+                new ArrayList<SimpleGeospatialPoint>(GeospatialPointDatabaseTest.cities.values());
         
         java.util.Collections.sort(expectedResults,
                 new GeospatialDistanceComparator<SimpleGeospatialPoint>(somerville));
@@ -126,7 +126,7 @@ public abstract class GeospatialPointDatabaseTest {
         SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
         List<SimpleGeospatialPoint> nearestNeighbors = database.getNearestNeighbors(somerville, 4, criteria);
         
-        Vector<SimpleGeospatialPoint> expectedResults = new Vector<SimpleGeospatialPoint>();
+        ArrayList<SimpleGeospatialPoint> expectedResults = new ArrayList<SimpleGeospatialPoint>();
         expectedResults.add(GeospatialPointDatabaseTest.cities.get("San Francisco"));
         expectedResults.add(GeospatialPointDatabaseTest.cities.get("Los Angeles"));
         expectedResults.add(GeospatialPointDatabaseTest.cities.get("Dallas"));
@@ -146,7 +146,7 @@ public abstract class GeospatialPointDatabaseTest {
         SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
         List<SimpleGeospatialPoint> nearestNeighbors = database.getNearestNeighbors(somerville, 4, 1000 * 1000);
         
-        Vector<SimpleGeospatialPoint> expectedResults = new Vector<SimpleGeospatialPoint>();
+        ArrayList<SimpleGeospatialPoint> expectedResults = new ArrayList<SimpleGeospatialPoint>();
         expectedResults.add(GeospatialPointDatabaseTest.cities.get("Boston"));
         expectedResults.add(GeospatialPointDatabaseTest.cities.get("New York"));
         expectedResults.add(GeospatialPointDatabaseTest.cities.get("Detroit"));
@@ -176,7 +176,7 @@ public abstract class GeospatialPointDatabaseTest {
         SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
         List<SimpleGeospatialPoint> nearestNeighbors = database.getNearestNeighbors(somerville, 4, 1000 * 1000, criteria);
         
-        Vector<SimpleGeospatialPoint> expectedResults = new Vector<SimpleGeospatialPoint>();
+        ArrayList<SimpleGeospatialPoint> expectedResults = new ArrayList<SimpleGeospatialPoint>();
         expectedResults.add(GeospatialPointDatabaseTest.cities.get("Boston"));
         expectedResults.add(GeospatialPointDatabaseTest.cities.get("Detroit"));
         
@@ -194,7 +194,7 @@ public abstract class GeospatialPointDatabaseTest {
         SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
         List<SimpleGeospatialPoint> nearestNeighbors = database.getAllNeighborsWithinDistance(somerville, 1000 * 1000);
         
-        Vector<SimpleGeospatialPoint> expectedResults = new Vector<SimpleGeospatialPoint>();
+        ArrayList<SimpleGeospatialPoint> expectedResults = new ArrayList<SimpleGeospatialPoint>();
         expectedResults.add(GeospatialPointDatabaseTest.cities.get("Boston"));
         expectedResults.add(GeospatialPointDatabaseTest.cities.get("New York"));
         expectedResults.add(GeospatialPointDatabaseTest.cities.get("Detroit"));
@@ -225,7 +225,7 @@ public abstract class GeospatialPointDatabaseTest {
         List<SimpleGeospatialPoint> nearestNeighbors =
                 database.getAllNeighborsWithinDistance(somerville, 10000 * 1000, criteria);
         
-        Vector<SimpleGeospatialPoint> expectedResults = new Vector<SimpleGeospatialPoint>();
+        ArrayList<SimpleGeospatialPoint> expectedResults = new ArrayList<SimpleGeospatialPoint>();
         expectedResults.add(GeospatialPointDatabaseTest.cities.get("Boston"));
         expectedResults.add(GeospatialPointDatabaseTest.cities.get("New York"));
         expectedResults.add(GeospatialPointDatabaseTest.cities.get("Detroit"));
@@ -247,8 +247,8 @@ public abstract class GeospatialPointDatabaseTest {
         
         database.add(movingPoint);
         
-        Vector<SimpleGeospatialPoint> expectedResults =
-                new Vector<SimpleGeospatialPoint>(GeospatialPointDatabaseTest.cities.values());
+        ArrayList<SimpleGeospatialPoint> expectedResults =
+                new ArrayList<SimpleGeospatialPoint>(GeospatialPointDatabaseTest.cities.values());
         
         expectedResults.add(movingPoint);
         
@@ -280,8 +280,8 @@ public abstract class GeospatialPointDatabaseTest {
         
         database.add(movingPoint);
         
-        Vector<SimpleGeospatialPoint> expectedResults =
-                new Vector<SimpleGeospatialPoint>(GeospatialPointDatabaseTest.cities.values());
+        ArrayList<SimpleGeospatialPoint> expectedResults =
+                new ArrayList<SimpleGeospatialPoint>(GeospatialPointDatabaseTest.cities.values());
         
         expectedResults.add(movingPoint);
         
@@ -315,7 +315,7 @@ public abstract class GeospatialPointDatabaseTest {
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         i = database.iterator();
         
-        Vector<SimpleGeospatialPoint> iteratedPoints = new Vector<SimpleGeospatialPoint>();
+        ArrayList<SimpleGeospatialPoint> iteratedPoints = new ArrayList<SimpleGeospatialPoint>();
         
         while(i.hasNext()) {
             iteratedPoints.add(i.next());
@@ -465,7 +465,7 @@ public abstract class GeospatialPointDatabaseTest {
         // interface states, "After this call returns, this collection will
         // contain no elements in common with the specified collection."
         
-        Vector<SimpleGeospatialPoint> citiesToRemove = new Vector<SimpleGeospatialPoint>();
+        ArrayList<SimpleGeospatialPoint> citiesToRemove = new ArrayList<SimpleGeospatialPoint>();
         
         citiesToRemove.add(GeospatialPointDatabaseTest.cities.get("Boston"));
         citiesToRemove.add(GeospatialPointDatabaseTest.cities.get("Las Vegas"));
@@ -485,7 +485,7 @@ public abstract class GeospatialPointDatabaseTest {
         database.addAll(GeospatialPointDatabaseTest.cities.values());
         
         List<SimpleGeospatialPoint> citiesToRetain =
-            new Vector<SimpleGeospatialPoint>(GeospatialPointDatabaseTest.cities.values());
+            new ArrayList<SimpleGeospatialPoint>(GeospatialPointDatabaseTest.cities.values());
         
         citiesToRetain = citiesToRetain.subList(0, 4);
         

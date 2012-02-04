@@ -6,7 +6,7 @@ import java.util.ArrayDeque;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -133,7 +133,7 @@ public class VPNodeTest {
         
         this.testNode.add(VPNodeTest.cities.get("Boston"));
         
-        // Node should return a non-null, non-empty vector after receiving point
+        // Node should return a non-null, non-empty ArrayList after receiving point
         assertTrue(this.testNode.isLeafNode());
         assertNotNull(this.testNode.getPoints());
         assertFalse(this.testNode.getPoints().isEmpty());
@@ -324,8 +324,8 @@ public class VPNodeTest {
         this.testNode.getNearestNeighbors(somerville, results);
         List<SimpleGeospatialPoint> sortedResults = results.toSortedList();
         
-        Vector<SimpleGeospatialPoint> expectedResults =
-                new Vector<SimpleGeospatialPoint>(VPNodeTest.cities.values());
+        ArrayList<SimpleGeospatialPoint> expectedResults =
+                new ArrayList<SimpleGeospatialPoint>(VPNodeTest.cities.values());
         
         java.util.Collections.sort(expectedResults,
                 new GeospatialDistanceComparator<SimpleGeospatialPoint>(somerville));
@@ -375,11 +375,11 @@ public class VPNodeTest {
         
         CachingGeospatialPoint somerville = new CachingGeospatialPoint(42.387597, -71.099497);
         
-        Vector<SimpleGeospatialPoint> results = new Vector<SimpleGeospatialPoint>();
+        ArrayList<SimpleGeospatialPoint> results = new ArrayList<SimpleGeospatialPoint>();
         this.testNode.getAllWithinRange(somerville, 1000 * 1000, null, results);
         
-        Vector<SimpleGeospatialPoint> expectedResults =
-                new Vector<SimpleGeospatialPoint>(VPNodeTest.cities.values());
+        ArrayList<SimpleGeospatialPoint> expectedResults =
+                new ArrayList<SimpleGeospatialPoint>(VPNodeTest.cities.values());
         
         java.util.Collections.sort(expectedResults,
                 new GeospatialDistanceComparator<SimpleGeospatialPoint>(somerville));
@@ -397,7 +397,7 @@ public class VPNodeTest {
             }
         };
         
-        results = new Vector<SimpleGeospatialPoint>();
+        results = new ArrayList<SimpleGeospatialPoint>();
         this.testNode.getAllWithinRange(somerville, 1000 * 1000, criteria, results);
         
         // Make sure search criteria are being applied as expected
@@ -416,7 +416,7 @@ public class VPNodeTest {
             assertNotNull(points[i]);
         }
         
-        Vector<SimpleGeospatialPoint> pointList = new Vector<SimpleGeospatialPoint>(points.length);
+        ArrayList<SimpleGeospatialPoint> pointList = new ArrayList<SimpleGeospatialPoint>(points.length);
         
         for(int i = 0; i < points.length; i++) {
             pointList.add(points[i]);
@@ -487,8 +487,8 @@ public class VPNodeTest {
     
     @Test
     public void testGatherLeafNodes() {
-        Vector<VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint>> nodes =
-                new Vector<VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint>>();
+        ArrayList<VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint>> nodes =
+                new ArrayList<VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint>>();
         
         assertTrue(this.testNode.isLeafNode());
         
@@ -497,7 +497,7 @@ public class VPNodeTest {
         assertEquals(1, nodes.size());
         assertTrue(nodes.contains(this.testNode));
         
-        nodes = new Vector<VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint>>();
+        nodes = new ArrayList<VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint>>();
         
         this.testNode.addAll(VPNodeTest.cities.values());
         

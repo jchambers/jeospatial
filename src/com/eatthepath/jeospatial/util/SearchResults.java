@@ -3,7 +3,7 @@ package com.eatthepath.jeospatial.util;
 import java.util.Collection;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import com.eatthepath.jeospatial.GeospatialPoint;
 import com.eatthepath.jeospatial.SearchCriteria;
@@ -216,7 +216,7 @@ public class SearchResults<E extends GeospatialPoint> extends PriorityQueue<E> {
      * @return a sorted list of the points in this result set
      */
     public List<E> toSortedList() {
-        Vector<E> sortedList = new Vector<E>(this);
+        ArrayList<E> sortedList = new ArrayList<E>(this);
         java.util.Collections.sort(sortedList, new GeospatialDistanceComparator<E>(this.queryPoint));
         
         return sortedList;

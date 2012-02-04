@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
 import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
@@ -93,7 +93,7 @@ public class ZipCodeExampleApp {
         
         // Just to be difficult, let's remove all of the zip codes from states
         // in the northeast and try the search again.
-        Vector<String> statesToClobber = new Vector<String>();
+        ArrayList<String> statesToClobber = new ArrayList<String>();
         statesToClobber.add("MA");
         statesToClobber.add("ME");
         statesToClobber.add("NH");
@@ -102,7 +102,7 @@ public class ZipCodeExampleApp {
         statesToClobber.add("NY");
         statesToClobber.add("CT");
         
-        Vector<ZipCode> zipCodesToRemove = new Vector<ZipCode>();
+        ArrayList<ZipCode> zipCodesToRemove = new ArrayList<ZipCode>();
         
         for(ZipCode z : zipCodes) {
             if(statesToClobber.contains(z.getState())) {

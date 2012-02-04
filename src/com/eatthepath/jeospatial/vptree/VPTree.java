@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import com.eatthepath.jeospatial.GeospatialPoint;
 import com.eatthepath.jeospatial.GeospatialPointDatabase;
@@ -85,7 +85,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         private VPNode<T> closer;
         private VPNode<T> farther;
         
-        private Vector<T> points;
+        private ArrayList<T> points;
         private final int binSize;
         
         /**
@@ -95,7 +95,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
          */
         public VPNode(int binSize) {
             this.binSize = binSize;
-            this.points = new Vector<T>(this.binSize);
+            this.points = new ArrayList<T>(this.binSize);
             
             this.center = null;
         }
@@ -352,7 +352,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
          *            store
          */
         private void storePoints(T[] points, int fromIndex, int toIndex) {
-            this.points = new Vector<T>(this.binSize);
+            this.points = new ArrayList<T>(this.binSize);
             
             for(int i = fromIndex; i < toIndex; i++) {
                 this.points.add(points[i]);
@@ -378,7 +378,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             if(!this.isLeafNode()) {
                 throw new IllegalStateException("Cannot retrieve points from a non-leaf node.");
             }
-            return new Vector<T>(this.points);
+            return new ArrayList<T>(this.points);
         }
         
         /**
@@ -520,7 +520,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
             this.farther = new VPNode<T>(points, partitionIndex, toIndex, this.binSize);
             
             // We're definitely not a leaf node now, so clear out our internal
-            // point vector (if we had one).
+            // point ArrayList (if we had one).
             this.points = null;
         }
         
@@ -628,11 +628,11 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         }
         
         /**
-         * Populates the given {@code Vector} with all points within the given
+         * Populates the given {@code ArrayList} with all points within the given
          * range that match the given search criteria (if any). If this node is
          * a leaf node, all points contained within the node that are within the
          * given distance of the query point and match the search criteria are
-         * added to the {@code Vector}. If this node is not a leaf node, its
+         * added to the {@code ArrayList}. If this node is not a leaf node, its
          * children are searched recursively.
          * 
          * @param queryPoint
@@ -646,9 +646,9 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
          *            is considered when deciding to include it in the result
          *            set
          * @param results
-         *            the {@code Vector} to populate
+         *            the {@code ArrayList} to populate
          */
-        public void getAllWithinRange(final CachingGeospatialPoint queryPoint, final double maxDistance, final SearchCriteria<T> criteria, final Vector<T> results) {
+        public void getAllWithinRange(final CachingGeospatialPoint queryPoint, final double maxDistance, final SearchCriteria<T> criteria, final ArrayList<T> results) {
             // If this is a leaf node, just add all of our points to the list if
             // they fall within range and meet the search criteria (if any).
             if(this.isLeafNode()) {
@@ -782,7 +782,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
                 throw new IllegalStateException("Leaf nodes have no children.");
             }
             
-            this.points = new Vector<T>(this.binSize);
+            this.points = new ArrayList<T>(this.binSize);
             
             if(!this.closer.isLeafNode()) {
                 this.closer.absorbChildren();
@@ -1218,7 +1218,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
     public boolean retainAll(Collection<?> c) {
         // We need to build up a list of points to remove after the initial
         // search to avoid concurrent modification woes
-        Vector<E> pointsToRemove = new Vector<E>();
+        ArrayList<E> pointsToRemove = new ArrayList<E>();
         
         for(E point : this) {
             if(!c.contains(point)) {
@@ -1351,7 +1351,7 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
      */
     @Override
     public List<E> getAllNeighborsWithinDistance(GeospatialPoint queryPoint, double maxDistance, SearchCriteria<E> searchCriteria) {
-        Vector<E> results = new Vector<E>(this.binSize);
+        ArrayList<E> results = new ArrayList<E>(this.binSize);
         this.root.getAllWithinRange(new CachingGeospatialPoint(queryPoint), maxDistance, searchCriteria, results);
         
         java.util.Collections.sort(results, new GeospatialDistanceComparator<E>(queryPoint));

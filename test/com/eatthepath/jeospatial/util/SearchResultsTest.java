@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -150,7 +150,7 @@ public class SearchResultsTest {
         List<SimpleGeospatialPoint> sortedResults = results.toSortedList();
         
         List<SimpleGeospatialPoint> expectedResults =
-                new Vector<SimpleGeospatialPoint>(SearchResultsTest.cities.values());
+                new ArrayList<SimpleGeospatialPoint>(SearchResultsTest.cities.values());
         
         java.util.Collections.sort(expectedResults, new GeospatialDistanceComparator<SimpleGeospatialPoint>(somerville));
         

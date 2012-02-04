@@ -3,7 +3,7 @@ package com.eatthepath.jeospatial.vptree;
 import static org.junit.Assert.*;
 
 import java.util.NoSuchElementException;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,11 +19,11 @@ public class TreeIteratorTest {
     private static final int DEFAULT_BIN_SIZE = 2;
     
     private VPTree<SimpleGeospatialPoint>.VPNode<SimpleGeospatialPoint> testNode;
-    private Vector<SimpleGeospatialPoint> cities;
+    private ArrayList<SimpleGeospatialPoint> cities;
     
     @Before
     public void setUp() throws Exception {
-        this.cities = new Vector<SimpleGeospatialPoint>();
+        this.cities = new ArrayList<SimpleGeospatialPoint>();
         
         this.cities.add(new SimpleGeospatialPoint(42.338947, -70.919635));
         this.cities.add(new SimpleGeospatialPoint(40.780751, -73.977182));
@@ -63,7 +63,7 @@ public class TreeIteratorTest {
         this.testNode.addAll(this.cities);
         TreeIterator<SimpleGeospatialPoint> i = new TreeIterator<SimpleGeospatialPoint>(this.testNode);
         
-        Vector<SimpleGeospatialPoint> returnedPoints = new Vector<SimpleGeospatialPoint>();
+        ArrayList<SimpleGeospatialPoint> returnedPoints = new ArrayList<SimpleGeospatialPoint>();
         
         while(i.hasNext()) {
             returnedPoints.add(i.next());

@@ -2,12 +2,12 @@ package com.eatthepath.jeospatial.vptree;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import com.eatthepath.jeospatial.GeospatialPoint;
 
 public class TreeIterator<E extends GeospatialPoint> implements Iterator<E> {
-    private Vector<VPTree<E>.VPNode<E>> leafNodes;
+    private ArrayList<VPTree<E>.VPNode<E>> leafNodes;
     
     private Iterator<VPTree<E>.VPNode<E>> leafIterator;
     private Iterator<E> currentIterator;
@@ -15,7 +15,7 @@ public class TreeIterator<E extends GeospatialPoint> implements Iterator<E> {
     private E nextElement;
     
     public TreeIterator(VPTree<E>.VPNode<E> root) {
-        this.leafNodes = new Vector<VPTree<E>.VPNode<E>>();
+        this.leafNodes = new ArrayList<VPTree<E>.VPNode<E>>();
         root.gatherLeafNodes(this.leafNodes);
         
         this.leafIterator = this.leafNodes.iterator();
