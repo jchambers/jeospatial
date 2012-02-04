@@ -22,13 +22,21 @@ public interface GeospatialPoint {
      * Sets the latitude of this point. Note that, for points in a
      * {@link GeospatialPointDatabase}, this method should not be called
      * directly. The database's {@code movePoint} method should be used instead.
+     * Latitudes must be in the range -90 to +90 degrees (inclusive on both
+     * ends); latitudes outside that range will be rejected with an
+     * {@code IllegalArgumentException}.
      * 
-     * @param latitude the latitude of this point in degrees
+     * @param latitude
+     *            the latitude of this point in degrees
      * 
      * @see GeospatialPointDatabase#movePoint(GeospatialPoint, GeospatialPoint)
      * @see GeospatialPointDatabase#movePoint(GeospatialPoint, double, double)
+     * 
+     * @throws IllegalArgumentException
+     *             if the given latitude is outside of the range -90 to +90
+     *             (inclusive on both ends)
      */
-	public void setLatitude(double latitude);
+	public void setLatitude(double latitude) throws IllegalArgumentException;
 	
 	/**
 	 * Sets the longitude of this point. Note that, for points in a
@@ -42,21 +50,23 @@ public interface GeospatialPoint {
 	 */
 	public void setLongitude(double longitude);
 	
-	/**
-	 * Returns the latitude of this point.
-	 * 
-	 * @return the latitude of this point in degrees
-	 */
+    /**
+     * Returns the latitude of this point.
+     * 
+     * @return the latitude of this point in degrees
+     */
 	public double getLatitude();
 	
-	/**
-	 * Returns the longitude of this point.
-	 * 
-	 * @return the longitude of this point in degrees
-	 */
+    /**
+     * Returns the longitude of this point. The returned longitude should be
+     * normalized to the range -180 degrees (inclusive) to 180 degrees
+     * (exclusive).
+     * 
+     * @return the longitude of this point in degrees
+     */
 	public double getLongitude();
 	
-	    /**
+    /**
      * <p>Calculates the "great circle" or orthometric distance between this
      * point and another point on the earth's surface. The great circle distance
      * is the minimum distance traveled to get from one point to the next on the

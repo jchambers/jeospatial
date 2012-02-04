@@ -12,13 +12,18 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 	private double latitude;
 	private double longitude;
 	
-	/**
-	 * Constructs a new geospatial point at the given latitude and longitude
-	 * coordinates.
-	 * 
-	 * @param latitude the latitude of this point in degrees
-	 * @param longitude the longitude of this point in degrees
-	 */
+    /**
+     * Constructs a new geospatial point at the given latitude and longitude
+     * coordinates.
+     * 
+     * @param latitude the latitude of this point in degrees
+     * @param longitude the longitude of this point in degrees
+     * 
+     * @throws IllegalArgumentException
+     *             if the given latitude is outside of the allowable range
+     * 
+     * @see GeospatialPoint#setLatitude(double)
+     */
 	public SimpleGeospatialPoint(double latitude, double longitude) {
 		this.setLatitude(latitude);
 		this.setLongitude(longitude);
@@ -34,13 +39,22 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 		this(p.getLatitude(), p.getLongitude());
 	}
 	
-	/**
-	 * Sets the latitude of this point.
-	 * 
-	 * @param latitude the latitude of this point in degrees
-	 */
+    /**
+     * Sets the latitude of this point.
+     * 
+     * @param latitude the latitude of this point in degrees
+     * 
+     * @throws IllegalArgumentException
+     *             if the given latitude is outside of the allowable range
+     * 
+     * @see GeospatialPoint#setLatitude(double)
+     */
 	@Override
 	public void setLatitude(double latitude) {
+	    if(latitude < -90 || latitude > 90) {
+	        throw new IllegalArgumentException("Latitude must be in the range -90 (inclusive) to +90 (inclusive).");
+	    }
+	    
 		this.latitude = latitude;
 	}
 	
@@ -61,7 +75,7 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 	 */
 	@Override
 	public void setLongitude(double longitude) {
-		this.longitude = longitude;
+		this.longitude = ((longitude + 180) % 360) - 180;
 	}
 	
 	/**
