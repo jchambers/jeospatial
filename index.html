@@ -77,6 +77,15 @@ SearchCriteria&lt;ZipCode&gt; searchCriteria = new SearchCriteria&lt;ZipCode&gt;
 List&lt;ZipCode&gt; closestOutsideMA = database.getNearestNeighbors(davisSquare, 10, searchCriteria);</pre>
 
 		<p>The <span class="code">closestOutsideMA</span> list will contain the ten closest zip codes to Davis Square sorted in order of increasing distance.</p>
+		
+		<h3>Finding points inside a bounding box</h3>
+
+		<p>If you're working with a section of a map with a cylindrical projection (e.g. a Google or Bing map), you might want to find all of the zip codes that are visible in that section of the map. A set of bounding box search methods comes in handy here:</p>
+
+		<pre class="brush: java;">// Find all of the zip codes in a bounding "box"
+List<ZipCode> inBoundingBox = database.getAllPointsInBoundingBox(-75, -70, 43, 42);</pre>
+
+		<p>As might expected, the <span class="code">inBoundingBox</span> list contains all of the zip codes that fall between the longitude lines of -75 and -70 degrees and the latitude lines of 42 and 43 degrees. Other variants of the <span class="code">getAllPointsInBoundingBox</span> method allow for sorting the results by proximity to some point and applying additional search criteria.</p>
 
 		<h2>Acknowledgements</h2>
 
