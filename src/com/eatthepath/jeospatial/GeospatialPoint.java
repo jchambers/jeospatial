@@ -84,4 +84,27 @@ public interface GeospatialPoint {
      * @see GeospatialPoint#EARTH_RADIUS
      */
 	public double getDistanceTo(GeospatialPoint otherPoint);
+	
+    /**
+     * <p>Calculates the "great circle" or orthometric distance between this
+     * point and another point on the earth's surface. The great circle distance
+     * is the minimum distance traveled to get from one point to the next on the
+     * surface of the earth.</p>
+     * 
+     * <p>Implementations of this method that incorporate the radius of the
+     * earth should reference the {@link #EARTH_RADIUS} property of this
+     * interface.</p>
+     * 
+     * @param latitude
+     *            the latitude, in degrees, of the other point to which to
+     *            calculate distance
+     * @param longitude
+     *            the longitude, in degrees, of the other point to which to
+     *            calculate distance
+     * 
+     * @return the great circle distance between the two points in meters
+     * 
+     * @see GeospatialPoint#EARTH_RADIUS
+     */
+	public double getDistanceTo(double latitude, double longitude);
 }

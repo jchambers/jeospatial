@@ -65,7 +65,7 @@ public abstract class GeospatialPointTest {
     }
     
     @Test
-    public void testGetDistanceTo() {
+    public void testGetDistanceToGeospatialPoint() {
         SimpleGeospatialPoint BOS = new SimpleGeospatialPoint(42.3631, -71.0064);
         SimpleGeospatialPoint LAX = new SimpleGeospatialPoint(33.9425, -118.4072);
         
@@ -83,5 +83,13 @@ public abstract class GeospatialPointTest {
         
         assertEquals("Distance between diametrically opposed points should be within 1m of 20015086m.",
                 20015086, a.getDistanceTo(b), 1d);
+    }
+    
+    @Test
+    public void testGetDistanceToDoubleDouble() {
+        SimpleGeospatialPoint BOS = new SimpleGeospatialPoint(42.3631, -71.0064);
+        SimpleGeospatialPoint LAX = new SimpleGeospatialPoint(33.9425, -118.4072);
+        
+        assertEquals(BOS.getDistanceTo(LAX), BOS.getDistanceTo(LAX.getLatitude(), LAX.getLongitude()), 0);
     }
 }

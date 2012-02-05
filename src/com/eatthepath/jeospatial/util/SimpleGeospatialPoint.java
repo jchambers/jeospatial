@@ -96,17 +96,34 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 	 * @return the great circle distance, in meters, between the two points
 	 */
 	public double getDistanceTo(GeospatialPoint otherPoint) {
-		double lat1 = Math.toRadians(this.getLatitude());
-		double lon1 = Math.toRadians(this.getLongitude());
-		double lat2 = Math.toRadians(otherPoint.getLatitude());
-		double lon2 = Math.toRadians(otherPoint.getLongitude());
-		
-		double angle = 2 * Math.asin(Math.min(1, Math.sqrt(this.haversine(lat2 - lat1) + Math.cos(lat1) * Math.cos(lat2) * this.haversine(lon2 - lon1))));
-		
-		return angle * GeospatialPoint.EARTH_RADIUS;
+		return this.getDistanceTo(otherPoint.getLatitude(), otherPoint.getLongitude());
 	}
 	
-	/**
+    /**
+     * Returns the "great circle" distance to another geospatial point.
+     * 
+     * @param latitude
+     *            the latitude, in degrees, of the other point to which to
+     *            calculate distance
+     * @param longitude
+     *            the longitude, in degrees, of the other point to which to
+     *            calculate distance
+     * 
+     * @return the great circle distance, in meters, between the two points
+     */
+	@Override
+    public double getDistanceTo(double latitude, double longitude) {
+	    double lat1 = Math.toRadians(this.getLatitude());
+        double lon1 = Math.toRadians(this.getLongitude());
+        double lat2 = Math.toRadians(latitude);
+        double lon2 = Math.toRadians(longitude);
+        
+        double angle = 2 * Math.asin(Math.min(1, Math.sqrt(this.haversine(lat2 - lat1) + Math.cos(lat1) * Math.cos(lat2) * this.haversine(lon2 - lon1))));
+        
+        return angle * GeospatialPoint.EARTH_RADIUS;
+    }
+
+    /**
 	 * Returns the haversine of the given angle.
 	 * 
 	 * @param theta the angle, in radians, for which to calculate the haversine
