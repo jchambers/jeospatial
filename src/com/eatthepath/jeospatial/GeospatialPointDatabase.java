@@ -233,6 +233,126 @@ public interface GeospatialPointDatabase<E extends GeospatialPoint> extends Coll
     public List<E> getAllNeighborsWithinDistance(GeospatialPoint queryPoint, double maxDistance, SearchCriteria<E> searchCriteria);
     
     /**
+     * Returns a list of all points in the database within the given bounding
+     * "box." A point is considered to be inside the box if its latitude falls
+     * between the given north and south limits (inclusive) and its longitude
+     * falls between the east and west limits (inclusive). The order of the
+     * returned list is not prescribed.
+     * 
+     * @param west the western limit of the bounding box in degrees
+     * @param east the eastern limit of the bounding box in degrees
+     * @param north the northern limit of the bounding box in degrees 
+     * @param south the southern limit of the bounding box in degrees
+     * 
+     * @return a list of points in the database within the given bounding box
+     * 
+     * @throws IllegalArgumentException
+     *             if the north or south limits fall outside of the range -90 to
+     *             +90 (inclusive) or if the northern limit is south of the
+     *             southern limit (or vice versa)
+     */
+    public List<E> getAllPointsInBoundingBox(double west, double east, double north, double south);
+    
+    /**
+     * Returns a list of all points in the database within the given bounding
+     * "box." A point is considered to be inside the box if its latitude falls
+     * between the given north and south limits (inclusive) and its longitude
+     * falls between the east and west limits (inclusive). The list of returned
+     * points is sorted in order of increasing distance from the given point.
+     * 
+     * @param west
+     *            the western limit of the bounding box in degrees
+     * @param east
+     *            the eastern limit of the bounding box in degrees
+     * @param north
+     *            the northern limit of the bounding box in degrees
+     * @param south
+     *            the southern limit of the bounding box in degrees
+     * @param orderingPoint
+     *            a point to use for sorting the list of results by distance;
+     *            may be {@code null} if no ordering is required
+     * 
+     * @return a list of points in the database within the given bounding box
+     *         sorted in order of increasing distance from the
+     *         {@code orderingPoint}
+     * 
+     * @throws IllegalArgumentException
+     *             if the north or south limits fall outside of the range -90 to
+     *             +90 (inclusive) or if the northern limit is south of the
+     *             southern limit (or vice versa)
+     */
+    public List<E> getAllPointsInBoundingBox(double west, double east, double north, double south,
+            GeospatialPoint orderingPoint);
+    
+    /**
+     * Returns a list of all points in the database within the given bounding
+     * "box" that also satisfy the given search criteria. A point is considered
+     * to be inside the box if its latitude falls between the given north and
+     * south limits (inclusive) and its longitude falls between the east and
+     * west limits (inclusive). The order of the returned list is not
+     * prescribed.
+     * 
+     * @param west
+     *            the western limit of the bounding box in degrees
+     * @param east
+     *            the eastern limit of the bounding box in degrees
+     * @param north
+     *            the northern limit of the bounding box in degrees
+     * @param south
+     *            the southern limit of the bounding box in degrees
+     * @param otherCriteria
+     *            a set of additional search criteria to apply to points that
+     *            lie within the bounding box; may be {@code null} if no
+     *            additional criteria are to be applied
+     * 
+     * @return a list of points in the database within the given bounding box
+     *         that satisfy the given search criteria
+     * 
+     * @throws IllegalArgumentException
+     *             if the north or south limits fall outside of the range -90 to
+     *             +90 (inclusive) or if the northern limit is south of the
+     *             southern limit (or vice versa)
+     */
+    public List<E> getAllPointsInBoundingBox(double west, double east, double north, double south,
+            SearchCriteria<E> otherCriteria);
+    
+    /**
+     * Returns a list of all points in the database within the given bounding
+     * "box" that also satisfy the given search criteria. A point is considered
+     * to be inside the box if its latitude falls between the given north and
+     * south limits (inclusive) and its longitude falls between the east and
+     * west limits (inclusive). The list of returned points is sorted in order
+     * of increasing distance from the given point.
+     * 
+     * @param west
+     *            the western limit of the bounding box in degrees
+     * @param east
+     *            the eastern limit of the bounding box in degrees
+     * @param north
+     *            the northern limit of the bounding box in degrees
+     * @param south
+     *            the southern limit of the bounding box in degrees
+     * @param otherCriteria
+     *            a set of additional search criteria to apply to points that
+     *            lie within the bounding box; may be {@code null} if no
+     *            additional criteria are to be applied
+     * @param orderingPoint
+     *            a point to use for sorting the list of results by distance;
+     *            may be {@code null} if no ordering is required
+     * 
+     * @return a list of points in the database within the given bounding box
+     *         that satisfy the given search criteria sorted in order of
+     *         increasing distance from the {@code orderingPoint}
+     * 
+     * @throws IllegalArgumentException
+     *             if the north or south limits fall outside of the range -90 to
+     *             +90 (inclusive) or if the northern limit is south of the
+     *             southern limit (or vice versa)
+     */
+    public List<E> getAllPointsInBoundingBox(double west, double east, double north, double south,
+            SearchCriteria<E> otherCriteria, GeospatialPoint orderingPoint);
+    
+    /**
      * Moves a point in the database to the given coordinates. Points in a
      * database should only ever be moved via this method (or its counterparts)
      * rather than the point's {@code setLatitude} or {@code setLongitude}

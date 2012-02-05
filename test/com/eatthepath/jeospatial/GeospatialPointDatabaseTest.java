@@ -238,6 +238,81 @@ public abstract class GeospatialPointDatabaseTest {
     }
     
     @Test
+    public void testGetAllPointsInBoundingBox() {
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
+        database.addAll(GeospatialPointDatabaseTest.cities.values());
+        
+        List<SimpleGeospatialPoint> pointsInBox = database.getAllPointsInBoundingBox(-90, -70, 43, 40);
+        
+        ArrayList<SimpleGeospatialPoint> expectedResults = new ArrayList<SimpleGeospatialPoint>();
+        expectedResults.add(GeospatialPointDatabaseTest.cities.get("Boston"));
+        expectedResults.add(GeospatialPointDatabaseTest.cities.get("New York"));
+        expectedResults.add(GeospatialPointDatabaseTest.cities.get("Chicago"));
+        expectedResults.add(GeospatialPointDatabaseTest.cities.get("Detroit"));
+        
+        assertEquals(expectedResults.size(), pointsInBox.size());
+        assertTrue(pointsInBox.containsAll(expectedResults));
+    }
+    
+    @Test
+    public void testGetAllPointsInBoundingBoxOrderingPoint() {
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
+        database.addAll(GeospatialPointDatabaseTest.cities.values());
+        
+        SimpleGeospatialPoint somerville = new SimpleGeospatialPoint(42.387597, -71.099497);
+        
+        List<SimpleGeospatialPoint> pointsInBox = database.getAllPointsInBoundingBox(-90, -70, 43, 40, somerville);
+        
+        ArrayList<SimpleGeospatialPoint> expectedResults = new ArrayList<SimpleGeospatialPoint>();
+        expectedResults.add(GeospatialPointDatabaseTest.cities.get("Boston"));
+        expectedResults.add(GeospatialPointDatabaseTest.cities.get("New York"));
+        expectedResults.add(GeospatialPointDatabaseTest.cities.get("Chicago"));
+        expectedResults.add(GeospatialPointDatabaseTest.cities.get("Detroit"));
+        
+        java.util.Collections.sort(expectedResults,
+                new GeospatialDistanceComparator<SimpleGeospatialPoint>(somerville));
+        
+        assertEquals(expectedResults, pointsInBox);
+    }
+    
+    @Test
+    public void testGetAllPointsInBoundingBoxSearchCriteria() {
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
+        database.addAll(GeospatialPointDatabaseTest.cities.values());
+        
+        SearchCriteria<SimpleGeospatialPoint> bostonOnlyCriteria = new SearchCriteria<SimpleGeospatialPoint>() {
+            @Override
+            public boolean matches(SimpleGeospatialPoint point) {
+                return point.equals(GeospatialPointDatabaseTest.cities.get("Boston"));
+            }
+        };
+        
+        List<SimpleGeospatialPoint> pointsInBox = database.getAllPointsInBoundingBox(-90, -70, 43, 40, bostonOnlyCriteria);
+        
+        ArrayList<SimpleGeospatialPoint> expectedResults = new ArrayList<SimpleGeospatialPoint>();
+        expectedResults.add(GeospatialPointDatabaseTest.cities.get("Boston"));
+        
+        assertEquals(expectedResults, pointsInBox);
+    }
+    
+    @Test
+    public void testGetAllPointsInBoundingBoxWideRatio() {
+        GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
+        
+        SimpleGeospatialPoint northeast = new SimpleGeospatialPoint(45, 100);
+        SimpleGeospatialPoint southwest = new SimpleGeospatialPoint(-10, -100);
+        
+        database.add(northeast);
+        database.add(southwest);
+        
+        List<SimpleGeospatialPoint> pointsInBox = database.getAllPointsInBoundingBox(-100, 100, 45, -10);
+        
+        assertEquals(2, pointsInBox.size());
+        assertTrue(pointsInBox.contains(northeast));
+        assertTrue(pointsInBox.contains(southwest));
+    }
+    
+    @Test
     public void testMovePointEDoubleDouble() {
         GeospatialPointDatabase<SimpleGeospatialPoint> database = this.createEmptyDatabase();
         database.addAll(GeospatialPointDatabaseTest.cities.values());

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import com.eatthepath.jeospatial.GeospatialPoint;
 import com.eatthepath.jeospatial.GeospatialPointDatabase;
 import com.eatthepath.jeospatial.SearchCriteria;
+import com.eatthepath.jeospatial.util.BoundingBoxSearchCriteria;
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
 import com.eatthepath.jeospatial.util.SearchResults;
 import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
@@ -1421,6 +1422,89 @@ public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabas
         this.root.getNearestNeighbors(queryPoint, results);
         
         return results.peek();
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#getAllPointsInBoundingBox(double, double, double, double)
+     */
+    @Override
+    public List<E> getAllPointsInBoundingBox(double west, double east, double north, double south) {
+        return this.getAllPointsInBoundingBox(west, east, north, south, null, null);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#getAllPointsInBoundingBox(double, double, double, double, com.eatthepath.jeospatial.GeospatialPoint)
+     */
+    @Override
+    public List<E> getAllPointsInBoundingBox(double west, double east, double north, double south,
+            GeospatialPoint orderingPoint) {
+        return this.getAllPointsInBoundingBox(west, east, north, south, null, orderingPoint);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#getAllPointsInBoundingBox(double, double, double, double, com.eatthepath.jeospatial.SearchCriteria)
+     */
+    @Override
+    public List<E> getAllPointsInBoundingBox(double west, double east, double north, double south,
+            SearchCriteria<E> otherCriteria) {
+        return this.getAllPointsInBoundingBox(west, east, north, south, otherCriteria, null);
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see com.eatthepath.jeospatial.GeospatialPointDatabase#getAllPointsInBoundingBox(double, double, double, double, com.eatthepath.jeospatial.SearchCriteria, com.eatthepath.jeospatial.GeospatialPoint)
+     */
+    @Override
+    public List<E> getAllPointsInBoundingBox(double west, double east, double north, double south,
+            SearchCriteria<E> otherCriteria, GeospatialPoint orderingPoint) {
+        // First, figure out the minimum search radius guaranteed to cover all
+        // of the points in the bounding box. Things are easier if the bounding
+        // box covers less than a hemisphere (the most common case), so start
+        // by calculating the search radius assuming a within-hemisphere box.
+        SimpleGeospatialPoint centroid = new SimpleGeospatialPoint(
+                (north + south) / 2.0,
+                west + (this.getDegreesEast(west, east) / 2.0));
+        
+        // The minimum search radius will be the longer of the distance from the
+        // centroid of the region to the corner closest to the equator or -- if
+        // the region crosses the equator -- the distance from the centroid to
+        // the intersection of the equator and the east or west bounds of the
+        // region. 
+        double searchRadius = Math.max(centroid.getDistanceTo(south, west), centroid.getDistanceTo(north, west));
+        
+        if(north > 0 && south < 0) {
+            searchRadius = Math.max(searchRadius, centroid.getDistanceTo(0, west));
+        }
+        
+        BoundingBoxSearchCriteria<E> criteria =
+                new BoundingBoxSearchCriteria<E>(west, east, north, south, otherCriteria);
+        
+        List<E> pointsInBox = this.getAllNeighborsWithinDistance(centroid, searchRadius, criteria);
+        
+        if(orderingPoint != null) {
+            java.util.Collections.sort(pointsInBox, new GeospatialDistanceComparator<E>(orderingPoint));
+        }
+        
+        return pointsInBox;
+    }
+    
+    /**
+     * Returns the angle, in degrees, between two lines of longitude.
+     * 
+     * @param west
+     *            the westmost line of longitude normalized to -180 (inclusive)
+     *            to +180 (exclusive)
+     * @param east
+     *            the eastmost line of longitude normalized to -180 (inclusive)
+     *            to +180 (exclusive)
+     * 
+     * @return the angle, in degrees, between the two lines of longitude
+     */
+    private double getDegreesEast(double west, double east) {
+        return east >= west ? east - west : Math.abs(360 - (east - west));
     }
 
     /*
