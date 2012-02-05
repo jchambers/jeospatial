@@ -1,4 +1,4 @@
-<project name="jeospatial" basedir="." default="dist">
+<project name="jeospatial" basedir="." default="build-jar">
 	<property name="src" location="src"/>
 	<property name="src.test" location="test"/>
 	<property name="src.example" location="example"/>
@@ -10,6 +10,7 @@
 	<property name="build" location="build"/>
 	<property name="build.test" location="build-test"/>
 	<property name="build.example" location="build-example"/>
+	<property name="build.jar" location="jeospatial.jar"/>
 	
 	<property name="lib" location="lib"/>
 	<property name="lib.junit" location="./junit-4.10.jar"/>
@@ -55,6 +56,10 @@
 		<javac includeantruntime="false" srcdir="${src}" destdir="${build}"/>
 	</target>
 	
+	<target name="build-jar" depends="build">
+		<jar basedir="${build}" destfile="${build.jar}"/>
+	</target>
+	
 	<target name="example-build" depends="build">
 		<javac includeantruntime="false" srcdir="${src.example}" destdir="${build.example}">
 			<classpath>
@@ -76,7 +81,7 @@
 	</target>
 	
 	<target name="test" depends="test-build">
-		<junit printsummary="on">
+		<junit printsummary="on" haltonfailure="on">
 			<classpath>
 				<pathelement path="${lib.junit}"/>
 				<pathelement path="${lib.opencsv}"/>
@@ -119,7 +124,7 @@
 		</javadoc>
 	</target>
 	
-	<target name="dist" depends="build, doc">
+	<target name="dist" depends="build, test, doc">
 		<jar basedir="${build}" destfile="${dist.jar}"/>
 		
 		<copy file="LICENSE" todir="${dist}"/>
