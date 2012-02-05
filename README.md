@@ -2,7 +2,7 @@
 
 Jeospatial is a simple geospatial point database library for Java. It aims to provide an easy-to-use and reasonably-high-performance set of tools for solving the _k_-nearest-neighbor problem on the earth's surface.
 
-Geospatial point databases in this library are implemented using [vantage point trees](http://pnylab.com/pny/papers/vptree/main.html) (or vp-trees), which are a data structure that performs binary space partitioning on a metric space. Construction of a geospatial point database executes in _O(n log(n))_ time and searches against that database execute in _O(log(n))_ time. As a practical point of reference, it takes about a second and a half to construct a vp-tree that contains roughly 30,000 geospatial points on a 2007 MacBook Pro, and about three seconds to execute 10,000 searches against that tree (for a search throughput of about 3,000 searches/second). By contrast, it takes between 300 and 400 milliseconds to sort a list of those 30,000 points by distance from a query point (for a search throughput of 2-3 searches/second).
+Geospatial point databases in this library are implemented using [vantage point trees](http://pnylab.com/pny/papers/vptree/main.html) (or vp-trees), which are a data structure that performs binary space partitioning on a metric space. Construction of a geospatial point database executes in _O(n log(n))_ time and searches against that database execute in _O(log(n))_ time. As a practical point of reference, it takes about a second and a half to construct a vp-tree that contains roughly 30,000 geospatial points on a 2007 MacBook Pro, and about two seconds to execute 10,000 searches against that tree (for a search throughput of about 5,000 searches/second). By contrast, it takes between 300 and 400 milliseconds to sort a list of those 30,000 points by distance from a query point (for a search throughput of 2-3 searches/second).
 
 ## Major concepts
 
@@ -66,6 +66,17 @@ List<ZipCode> closestOutsideMA = database.getNearestNeighbors(davisSquare, 10, s
 ```
 
 The `closestOutsideMA` list will contain the ten closest zip codes to Davis Square sorted in order of increasing distance.
+
+### Finding points inside a bounding box
+
+If you're working with a section of a map with a cylindrical projection (e.g. a Google or Bing map), you might want to find all of the zip codes that are visible in that section of the map. A set of bounding box search methods comes in handy here:
+
+```java
+// Find all of the zip codes in a bounding "box"
+List<ZipCode> inBoundingBox = database.getAllPointsInBoundingBox(-75, -70, 43, 42);
+```
+
+As might expected, the `inBoundingBox` list contains all of the zip codes that fall between the longitude lines of -75 and -70 degrees and the latitude lines of 42 and 43 degrees. Other variants of the `getAllPointsInBoundingBox` method allow for sorting the results by proximity to some point and applying additional search criteria.
 
 Acknowledgements
 ----------------
