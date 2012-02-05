@@ -15,7 +15,7 @@
 	<property name="lib.junit" location="./junit-4.10.jar"/>
 	<property name="lib.opencsv" location="${lib}/opencsv-2.3.jar"/>
 	
-	<property name="distfile" location="jeospatial.jar"/>
+	<property name="dist" location="dist"/>
 	
 	<target name="init">
 		<mkdir dir="${build}"/>
@@ -24,6 +24,31 @@
 		<mkdir dir="${doc}"/>
 		<mkdir dir="${doc.javadoc}"/>
 		<mkdir dir="${doc.test}"/>
+		<mkdir dir="${dist}"/>
+		
+		<condition property="dist.jar" value="${dist}/jeospatial-${dist.version}.jar">
+			<isset property="dist.version"/>
+		</condition>
+		
+		<condition property="dist.zip" value="jeospatial-${dist.version}.zip">
+			<isset property="dist.version"/>
+		</condition>
+		
+		<condition property="dist.gzip" value="jeospatial-${dist.version}.tar.gz">
+			<isset property="dist.version"/>
+		</condition>
+		
+		<condition property="dist.jar" value="${dist}/jeospatial.jar">
+			<not><isset property="dist.version"/></not>
+		</condition>
+		
+		<condition property="dist.zip" value="jeospatial.zip">
+			<not><isset property="dist.version"/></not>
+		</condition>
+		
+		<condition property="dist.gzip" value="jeospatial.tar.gz">
+			<not><isset property="dist.version"/></not>
+		</condition>
 	</target>
 	
 	<target name="build" depends="init">
@@ -94,8 +119,42 @@
 		</javadoc>
 	</target>
 	
-	<target name="dist" depends="build">
-		<jar basedir="${build}" destfile="${distfile}"/>
+	<target name="dist" depends="build, doc">
+		<jar basedir="${build}" destfile="${dist.jar}"/>
+		
+		<copy file="LICENSE" todir="${dist}"/>
+		<copy file="README.md" todir="${dist}"/>
+		<copy file="build.xml" todir="${dist}"/>
+		
+		<copy todir="${dist}/data">
+			<fileset dir="data"/>
+		</copy>
+		
+		<copy todir="${dist}/doc/javadoc">
+			<fileset dir="${doc.javadoc}"/>
+		</copy>
+		
+		<copy todir="${dist}/example">
+			<fileset dir="${src.example}"/>
+		</copy>
+		
+		<copy todir="${dist}/lib">
+			<fileset dir="${lib}"/>
+		</copy>
+		
+		<copy todir="${dist}/src">
+			<fileset dir="${src}"/>
+		</copy>
+		
+		<copy todir="${dist}/test">
+			<fileset dir="${src.test}"/>
+		</copy>
+		
+		<zip destfile="${dist.zip}" basedir="${dist}"/>
+		
+		<tar destfile="jeospatial.tar" basedir="${dist}"/>
+		<gzip src="jeospatial.tar" destfile="${dist.gzip}"/>
+		<delete file="jeospatial.tar"/>
 	</target>
 	
 	<target name="clean">
@@ -103,7 +162,15 @@
 		<delete dir="${build.test}"/>
 		<delete dir="${build.example}"/>
 		<delete dir="${doc}"/>
+		<delete dir="${dist}"/>
 		
-		<delete file="${distfile}"/>
+		<delete>
+			<fileset dir=".">
+				<include name="jeospatial*.jar"/>
+				<include name="jeospatial*.zip"/>
+				<include name="jeospatial*.tar"/>
+				<include name="jeospatial*.gz"/>
+			</fileset>
+		</delete>
 	</target>
 </project>
