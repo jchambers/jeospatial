@@ -83,9 +83,6 @@ public class ConciseExampleApp {
         List<ZipCode> zipCodes = ZipCode.loadAllFromCsvFile();
         GeospatialPointDatabase<ZipCode> database = new VPTree<ZipCode>(zipCodes);
         
-        // Pick a query point (Davis Square in Somerville, MA, USA)
-        SimpleGeospatialPoint davisSquare = new SimpleGeospatialPoint(42.396745, -71.122479);
-        
         // Find all of the zip codes in a bounding "box"
         List<ZipCode> inBoundingBox = database.getAllPointsInBoundingBox(-75, -70, 43, 42);
         
