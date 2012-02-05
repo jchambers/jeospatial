@@ -67,6 +67,9 @@
 					<!-- Manually exclude abstract test cases -->
 					<exclude name="**/GeospatialPointDatabaseTest.java"/>
 					<exclude name="**/GeospatialPointTest.java"/>
+					
+					<!-- Manually exclude things that are not actually unit tests -->
+					<exclude name="**/LoadTestApp.java"/>
 				</fileset>
 			</batchtest>
 		</junit>
