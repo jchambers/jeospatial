@@ -1,7 +1,8 @@
 package com.eatthepath.jeospatial.vptree;
 
 /**
- * A PartitionException is thrown when partitioning of a vp-tree node fails.
+ * A {@code PartitionException} is thrown when partitioning of a {@link VPTree}
+ * node fails.
  * 
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  */
