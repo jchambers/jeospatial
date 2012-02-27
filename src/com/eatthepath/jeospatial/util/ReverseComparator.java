@@ -3,10 +3,13 @@ package com.eatthepath.jeospatial.util;
 import java.util.Comparator;
 
 /**
- * <p>A Comparator that reverse the sorting order imposed by another Comparator.
- * In other words, if an existing Comparator sorted numbers in ascending order,
- * a ReverseComparator for that Comparator would sort numbers in descending
- * order.</p>
+ * <p>
+ * A {@link java.util.Comparator} that reverses the sorting order imposed by
+ * another {@link java.util.Comparator}. In other words, if an existing
+ * {@link java.util.Comparator} sorted numbers in ascending order, a
+ * {@code ReverseComparator} for that {@link java.util.Comparator} would sort
+ * numbers in descending order.
+ * </p>
  * 
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  */
