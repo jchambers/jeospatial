@@ -1,3 +1,7 @@
+html {
+	background-image:		url(cartographer.png);
+}
+
 body {
 	width:					800px;
 	margin:					10px auto 40px;
@@ -15,6 +19,8 @@ body {
 	border:					solid #eee 1px;
 	
 	font-family:			Geneva, Lucida Sans, Lucida Grande, Lucida Sans Unicode, Verdana, sans-serif;
+	
+	background-color:		white;
 }
 
 #links {
