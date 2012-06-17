@@ -106,7 +106,7 @@ public class SearchResults<E extends GeospatialPoint> extends PriorityQueue<E> {
      *            always be rejected
      */
     public SearchResults(GeospatialPoint queryPoint, int maxSize, double maxDistance, SearchCriteria<E> criteria) {
-        super(maxSize, new ReverseComparator<E>(new GeospatialDistanceComparator<E>(queryPoint)));
+        super(maxSize, java.util.Collections.reverseOrder(new GeospatialDistanceComparator<E>(queryPoint)));
         
         this.queryPoint = new SimpleGeospatialPoint(queryPoint);
         this.maxSize = maxSize;
