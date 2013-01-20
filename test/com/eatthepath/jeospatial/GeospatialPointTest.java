@@ -15,56 +15,6 @@ public abstract class GeospatialPointTest {
     public abstract GeospatialPoint getPoint(double latitude, double longitude);
     
     @Test
-    public void testGetSetLatitude() {
-        GeospatialPoint p = this.getPoint(10, 20);
-        assertEquals(10, p.getLatitude(), 0);
-        
-        p.setLatitude(30);
-        assertEquals(30, p.getLatitude(), 0);
-    }
-    
-    @Test
-    public void testSetLatitudeEdgeOfRange() {
-        GeospatialPoint p = this.getPoint(10, 20);
-        
-        // As long as we don't throw an exception here, everything's fine.
-        p.setLatitude(90);
-        p.setLatitude(-90);
-    }
-    
-    @Test(expected = IllegalArgumentException.class)
-    public void testSetLatitudeOutOfRange() {
-        GeospatialPoint p = this.getPoint(10, 20);
-        p.setLatitude(120);
-    }
-    
-    @Test
-    public void testGetSetLongitude() {
-        GeospatialPoint p = this.getPoint(10, 20);
-        assertEquals(20, p.getLongitude(), 0);
-        
-        p.setLongitude(30);
-        assertEquals(30, p.getLongitude(), 0);
-    }
-    
-    @Test
-    public void testSetLongitudeNormalization() {
-        GeospatialPoint p = this.getPoint(0, 0);
-        
-        p.setLongitude(-180);
-        assertEquals(-180, p.getLongitude(), 0);
-        
-        p.setLongitude(180);
-        assertEquals(-180, p.getLongitude(), 0);
-        
-        p.setLongitude(240);
-        assertEquals(-120, p.getLongitude(), 0);
-        
-        p.setLongitude(360);
-        assertEquals(0, p.getLongitude(), 0);
-    }
-    
-    @Test
     public void testGetDistanceToGeospatialPoint() {
         SimpleGeospatialPoint BOS = new SimpleGeospatialPoint(42.3631, -71.0064);
         SimpleGeospatialPoint LAX = new SimpleGeospatialPoint(33.9425, -118.4072);

@@ -19,38 +19,6 @@ public interface GeospatialPoint {
     public static final double EARTH_RADIUS = 6371 * 1000; // meters
     
     /**
-     * Sets the latitude of this point. Note that, for points in a
-     * {@link GeospatialPointDatabase}, this method should not be called
-     * directly. The database's {@code movePoint} method should be used instead.
-     * Latitudes must be in the range -90 to +90 degrees (inclusive on both
-     * ends); latitudes outside that range will be rejected with an
-     * {@code IllegalArgumentException}.
-     * 
-     * @param latitude
-     *            the latitude of this point in degrees
-     * 
-     * @see GeospatialPointDatabase#movePoint(GeospatialPoint, GeospatialPoint)
-     * @see GeospatialPointDatabase#movePoint(GeospatialPoint, double, double)
-     * 
-     * @throws IllegalArgumentException
-     *             if the given latitude is outside of the range -90 to +90
-     *             (inclusive on both ends)
-     */
-	public void setLatitude(double latitude) throws IllegalArgumentException;
-	
-	/**
-	 * Sets the longitude of this point. Note that, for points in a
-     * {@link GeospatialPointDatabase}, this method should not be called
-     * directly. The database's {@code movePoint} method should be used instead.
-	 * 
-	 * @param longitude the longitude of this point in degrees
-	 * 
-     * @see GeospatialPointDatabase#movePoint(GeospatialPoint, GeospatialPoint)
-     * @see GeospatialPointDatabase#movePoint(GeospatialPoint, double, double)
-	 */
-	public void setLongitude(double longitude);
-	
-    /**
      * Returns the latitude of this point.
      * 
      * @return the latitude of this point in degrees

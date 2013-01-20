@@ -49,7 +49,6 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
      * 
      * @see GeospatialPoint#setLatitude(double)
      */
-	@Override
 	public void setLatitude(double latitude) {
 	    if(latitude < -90 || latitude > 90) {
 	        throw new IllegalArgumentException("Latitude must be in the range -90 (inclusive) to +90 (inclusive).");
@@ -73,7 +72,6 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 	 * 
 	 * @param longitude the longitude of this point in degrees
 	 */
-	@Override
 	public void setLongitude(double longitude) {
 		this.longitude = ((longitude + 180) % 360) - 180;
 	}

@@ -510,34 +510,4 @@ public class LockingVPTree<E extends GeospatialPoint> extends VPTree<E> {
             this.lock.readLock().unlock();
         }
     }
-    
-    /*
-     * (non-Javadoc)
-     * @see com.eatthepath.jeospatial.vptree.VPTree#movePoint(com.eatthepath.jeospatial.GeospatialPoint, double, double)
-     */
-    @Override
-    public void movePoint(E point, double latitude, double longitude) {
-        this.lock.writeLock().lock();
-        
-        try {
-            super.movePoint(point, latitude, longitude);
-        } finally {
-            this.lock.writeLock().unlock();
-        }
-    }
-    
-    /*
-     * (non-Javadoc)
-     * @see com.eatthepath.jeospatial.vptree.VPTree#movePoint(com.eatthepath.jeospatial.GeospatialPoint, com.eatthepath.jeospatial.GeospatialPoint)
-     */
-    @Override
-    public void movePoint(E point, GeospatialPoint destination) {
-        this.lock.writeLock().lock();
-        
-        try {
-            super.movePoint(point, destination);
-        } finally {
-            this.lock.writeLock().unlock();
-        }
-    }
 }
