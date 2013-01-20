@@ -4,6 +4,10 @@
 .settings
 bin
 *.jar
+*.zip
+*.gz
 build
 build-test
-doc/javadoc
+build-example
+doc
+dist
