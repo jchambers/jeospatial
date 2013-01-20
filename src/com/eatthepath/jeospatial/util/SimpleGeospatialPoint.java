@@ -21,8 +21,6 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
      * 
      * @throws IllegalArgumentException
      *             if the given latitude is outside of the allowable range
-     * 
-     * @see GeospatialPoint#setLatitude(double)
      */
 	public SimpleGeospatialPoint(double latitude, double longitude) {
 		this.setLatitude(latitude);
@@ -46,8 +44,6 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
      * 
      * @throws IllegalArgumentException
      *             if the given latitude is outside of the allowable range
-     * 
-     * @see GeospatialPoint#setLatitude(double)
      */
 	public void setLatitude(double latitude) {
 	    if(latitude < -90 || latitude > 90) {
