@@ -6,7 +6,7 @@ import java.util.HashSet;
 
 import org.junit.Test;
 
-import com.eatthepath.jeospatial.GeospatialPointDatabase;
+import com.eatthepath.jeospatial.GeospatialPointIndex;
 import com.eatthepath.jeospatial.GeospatialPointDatabaseTest;
 import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
 
@@ -21,7 +21,7 @@ public class VPTreeTest extends GeospatialPointDatabaseTest {
      * @see com.eatthepath.jeospatial.GeospatialPointDatabaseTest#createEmptyDatabase()
      */
     @Override
-    public GeospatialPointDatabase<SimpleGeospatialPoint> createEmptyDatabase() {
+    public GeospatialPointIndex<SimpleGeospatialPoint> createEmptyDatabase() {
         return new VPTree<SimpleGeospatialPoint>(2);
     }
     

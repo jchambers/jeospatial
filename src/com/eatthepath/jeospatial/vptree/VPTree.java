@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.ArrayList;
 
 import com.eatthepath.jeospatial.GeospatialPoint;
-import com.eatthepath.jeospatial.GeospatialPointDatabase;
+import com.eatthepath.jeospatial.GeospatialPointIndex;
 import com.eatthepath.jeospatial.SearchCriteria;
 import com.eatthepath.jeospatial.util.BoundingBoxSearchCriteria;
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
@@ -67,7 +67,7 @@ import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
  *      General Metric Spaces". Proceedings of the Fifth Annual ACM-SIAM
  *      Symposium on Discrete Algorithms (SODA). 1993.</a>
  */
-public class VPTree<E extends GeospatialPoint> implements GeospatialPointDatabase<E> {
+public class VPTree<E extends GeospatialPoint> implements GeospatialPointIndex<E> {
     /**
      * <p>{@code VPNodes} are the nodes of a vantage point tree. {@code VPNodes}
      * may or may not be leaf nodes; if they are leaf nodes, they have no

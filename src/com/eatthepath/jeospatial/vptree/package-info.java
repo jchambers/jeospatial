@@ -1,5 +1,5 @@
 /**
- * <p>Provides {@link com.eatthepath.jeospatial.GeospatialPointDatabase}
+ * <p>Provides {@link com.eatthepath.jeospatial.GeospatialPointIndex}
  * implementations based on vantage point trees.</p>
  * 
  * <p>Vantage point trees (or vp-trees) are data structures that perform binary

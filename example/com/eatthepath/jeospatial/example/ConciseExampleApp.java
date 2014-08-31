@@ -3,7 +3,7 @@ package com.eatthepath.jeospatial.example;
 import java.io.IOException;
 import java.util.List;
 
-import com.eatthepath.jeospatial.GeospatialPointDatabase;
+import com.eatthepath.jeospatial.GeospatialPointIndex;
 import com.eatthepath.jeospatial.SearchCriteria;
 import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
 import com.eatthepath.jeospatial.vptree.VPTree;
@@ -26,7 +26,7 @@ public class ConciseExampleApp {
         // Load a bunch of zip codes from a file and construct a vp-tree from
         // those points
         List<ZipCode> zipCodes = ZipCode.loadAllFromCsvFile();
-        GeospatialPointDatabase<ZipCode> database = new VPTree<ZipCode>(zipCodes);
+        GeospatialPointIndex<ZipCode> database = new VPTree<ZipCode>(zipCodes);
         
         // Pick a query point (Davis Square in Somerville, MA, USA)
         SimpleGeospatialPoint davisSquare = new SimpleGeospatialPoint(42.396745, -71.122479);
@@ -41,7 +41,7 @@ public class ConciseExampleApp {
         // Load a bunch of zip codes from a file and construct a vp-tree from
         // those points
         List<ZipCode> zipCodes = ZipCode.loadAllFromCsvFile();
-        GeospatialPointDatabase<ZipCode> database = new VPTree<ZipCode>(zipCodes);
+        GeospatialPointIndex<ZipCode> database = new VPTree<ZipCode>(zipCodes);
         
         // Pick a query point (Davis Square in Somerville, MA, USA)
         SimpleGeospatialPoint davisSquare = new SimpleGeospatialPoint(42.396745, -71.122479);
@@ -56,7 +56,7 @@ public class ConciseExampleApp {
         // Load a bunch of zip codes from a file and construct a vp-tree from
         // those points
         List<ZipCode> zipCodes = ZipCode.loadAllFromCsvFile();
-        GeospatialPointDatabase<ZipCode> database = new VPTree<ZipCode>(zipCodes);
+        GeospatialPointIndex<ZipCode> database = new VPTree<ZipCode>(zipCodes);
         
         // Pick a query point (Davis Square in Somerville, MA, USA)
         SimpleGeospatialPoint davisSquare = new SimpleGeospatialPoint(42.396745, -71.122479);
@@ -81,7 +81,7 @@ public class ConciseExampleApp {
         // Load a bunch of zip codes from a file and construct a vp-tree from
         // those points
         List<ZipCode> zipCodes = ZipCode.loadAllFromCsvFile();
-        GeospatialPointDatabase<ZipCode> database = new VPTree<ZipCode>(zipCodes);
+        GeospatialPointIndex<ZipCode> database = new VPTree<ZipCode>(zipCodes);
         
         // Find all of the zip codes in a bounding "box"
         List<ZipCode> inBoundingBox = database.getAllPointsInBoundingBox(-75, -70, 43, 42);

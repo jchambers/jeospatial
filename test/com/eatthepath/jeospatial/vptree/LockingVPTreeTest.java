@@ -8,7 +8,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.eatthepath.jeospatial.GeospatialPoint;
-import com.eatthepath.jeospatial.GeospatialPointDatabase;
+import com.eatthepath.jeospatial.GeospatialPointIndex;
 import com.eatthepath.jeospatial.GeospatialPointDatabaseTest;
 import com.eatthepath.jeospatial.example.ZipCode;
 import com.eatthepath.jeospatial.util.GeospatialDistanceComparator;
@@ -75,7 +75,7 @@ public class LockingVPTreeTest extends GeospatialPointDatabaseTest {
     }
     
     @Override
-    public GeospatialPointDatabase<SimpleGeospatialPoint> createEmptyDatabase() {
+    public GeospatialPointIndex<SimpleGeospatialPoint> createEmptyDatabase() {
         return new LockingVPTree<SimpleGeospatialPoint>(2, true);
     }
     
