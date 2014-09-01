@@ -1,21 +1,21 @@
 package com.eatthepath.jeospatial.util;
 
 import com.eatthepath.jeospatial.GeospatialPoint;
-import com.eatthepath.jeospatial.GeospatialPointIndex;
+import com.eatthepath.jeospatial.GeospatialIndex;
 import com.eatthepath.jeospatial.SearchCriteria;
 
 /**
  * A {@link SearchCriteria} implementation that matches all points within a
  * bounding "box." The {@code BoundingBoxSearchCriteria} class is designed to
  * assist in implementing bounding box search methods specified by the
- * {@link GeospatialPointIndex} interface.
+ * {@link GeospatialIndex} interface.
  * 
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  * 
- * @see GeospatialPointIndex#getAllPointsInBoundingBox(double, double, double, double)
- * @see GeospatialPointIndex#getAllPointsInBoundingBox(double, double, double, double, GeospatialPoint)
- * @see GeospatialPointIndex#getAllPointsInBoundingBox(double, double, double, double, SearchCriteria)
- * @see GeospatialPointIndex#getAllPointsInBoundingBox(double, double, double, double, SearchCriteria, GeospatialPoint)
+ * @see GeospatialIndex#getAllPointsInBoundingBox(double, double, double, double)
+ * @see GeospatialIndex#getAllPointsInBoundingBox(double, double, double, double, GeospatialPoint)
+ * @see GeospatialIndex#getAllPointsInBoundingBox(double, double, double, double, SearchCriteria)
+ * @see GeospatialIndex#getAllPointsInBoundingBox(double, double, double, double, SearchCriteria, GeospatialPoint)
  */
 public class BoundingBoxSearchCriteria<T extends GeospatialPoint> implements SearchCriteria<T> {
     private final double north;
