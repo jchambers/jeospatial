@@ -1,55 +1,72 @@
 package com.eatthepath.jeospatial;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
-import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
-import com.eatthepath.jvptree.DistanceFunction;
 import com.eatthepath.jvptree.VPTree;
 
-public class VPGeospatialPointIndex<E extends GeospatialPoint> extends VPTree<GeospatialPoint> implements GeospatialIndex<GeospatialPoint> {
+public class VPGeospatialPointIndex<E extends GeospatialPoint> implements GeospatialIndex<E> {
+
+    private final VPTree<GeospatialPoint> vpTree;
 
     public VPGeospatialPointIndex() {
-        super(new HaversineDistanceFunction<GeospatialPoint>());
+        this.vpTree = new VPTree<GeospatialPoint>(new HaversineDistanceFunction<GeospatialPoint>());
     }
 
-    // TODO Resolve generics issues
-    public List<E> getAllPointsInBoundingBox(double west, double east, double north, double south) {
-        final SimpleGeospatialPoint centroid;
+    @SuppressWarnings("unchecked")
+    public List<E> getAllPointsInBoundingBox(final double west, final double east, final double north, final double south) {
+        final GeospatialPoint centroid;
         {
             // Via http://www.movable-type.co.uk/scripts/latlong.html
             final double Bx = Math.cos(north) * Math.cos(east-west);
             final double By = Math.cos(north) * Math.sin(east-west);
 
-            centroid = new SimpleGeospatialPoint(
-                    Math.atan2(Math.sin(south) + Math.sin(north), Math.sqrt((Math.cos(south) + Bx) * (Math.cos(south) + Bx) + (By * By))),
-                    west + Math.atan2(By, Math.cos(south) + Bx));
+            final double latitude = Math.atan2(Math.sin(south) + Math.sin(north), Math.sqrt((Math.cos(south) + Bx) * (Math.cos(south) + Bx) + (By * By)));
+            final double longitude = west + Math.atan2(By, Math.cos(south) + Bx);
+
+            centroid = new GeospatialPoint() {
+                public double getLongitude() {
+                    return longitude;
+                }
+
+                public double getLatitude() {
+                    return latitude;
+                }
+            };
         }
 
-        final double searchRadius =
-                this.getDistanceFunction().getDistance(centroid, new SimpleGeospatialPoint(north, east));
+        final double searchRadius;
+        {
+            final HaversineDistanceFunction<GeospatialPoint> distanceFunction =
+                    new HaversineDistanceFunction<GeospatialPoint>();
 
-        final ArrayList<GeospatialPoint> points = new ArrayList<GeospatialPoint>();
+            searchRadius = distanceFunction.getDistance(centroid, new GeospatialPoint() {
+                public double getLongitude() {
+                    return east;
+                }
 
-        // TODO Invert the logic here to make it more affirmative
-        for (final GeospatialPoint point : this.getAllWithinRange(centroid, searchRadius)) {
-            if (point.getLatitude() > north || point.getLatitude() < south) {
-                continue;
+                public double getLatitude() {
+                    return north;
+                }
+            });
+        }
+
+        final ArrayList<E> points = new ArrayList<E>();
+
+        for (final E point : (List<E>)this.vpTree.getAllWithinRange(centroid, searchRadius)) {
+            if (point.getLatitude() < north && point.getLatitude() > south) {
+                // If the point is inside the bounding box, it will be shorter to get to the point by traveling east
+                // from the western boundary than by traveling east from the eastern boundary.
+                if (this.getDegreesEastFromMeridian(west, point) <= this.getDegreesEastFromMeridian(east, point)) {
+                    // Similarly, it should be shorter to get to the point by traveling west from the eastern boundary
+                    // than by traveling west from the western boundary.
+                    if(this.getDegreesWestFromMeridian(east, point) <= this.getDegreesWestFromMeridian(west, point)) {
+                        points.add(point);
+                    }
+                }
             }
-
-            // If the point is inside the bounding box, it will be shorter to get to the point by traveling east from
-            // the western boundary than by traveling east from the eastern boundary.
-            if(this.getDegreesEastFromMeridian(west, point) > this.getDegreesEastFromMeridian(east, point)) {
-                continue;
-            }
-
-            // Similarly, it should be shorter to get to the point by traveling west from the eastern boundary than by
-            // traveling west from the western boundary.
-            if(this.getDegreesWestFromMeridian(east, point) > this.getDegreesWestFromMeridian(west, point)) {
-                continue;
-            }
-
-            points.add(point);
         }
 
         return points;
@@ -81,5 +98,68 @@ public class VPGeospatialPointIndex<E extends GeospatialPoint> extends VPTree<Ge
     private double getDegreesWestFromMeridian(double longitude, E point) {
         return point.getLongitude() < longitude ?
                 longitude - point.getLongitude() : Math.abs(360 - (longitude - point.getLongitude()));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends E> List<E> getNearestNeighbors(T queryPoint, int maxResults) {
+        return (List<E>) this.vpTree.getNearestNeighbors(queryPoint, maxResults);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends E> List<E> getAllWithinRange(T queryPoint, double maxDistance) {
+        return (List<E>) this.vpTree.getAllWithinRange(queryPoint, maxDistance);
+    }
+
+    public int size() {
+        return this.vpTree.size();
+    }
+
+    public boolean isEmpty() {
+        return this.vpTree.isEmpty();
+    }
+
+    public boolean contains(Object o) {
+        return this.vpTree.contains(o);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Iterator<E> iterator() {
+        return (Iterator<E>) this.vpTree.iterator();
+    }
+
+    public Object[] toArray() {
+        return this.vpTree.toArray();
+    }
+
+    public <T> T[] toArray(T[] a) {
+        return this.vpTree.toArray(a);
+    }
+
+    public boolean add(E e) {
+        return this.vpTree.add(e);
+    }
+
+    public boolean remove(Object o) {
+        return this.vpTree.remove(o);
+    }
+
+    public boolean containsAll(Collection<?> c) {
+        return this.vpTree.containsAll(c);
+    }
+
+    public boolean addAll(Collection<? extends E> c) {
+        return this.vpTree.addAll(c);
+    }
+
+    public boolean removeAll(Collection<?> c) {
+        return this.vpTree.removeAll(c);
+    }
+
+    public boolean retainAll(Collection<?> c) {
+        return this.vpTree.retainAll(c);
+    }
+
+    public void clear() {
+        this.vpTree.clear();
     }
 }
