@@ -16,7 +16,7 @@ public class VPGeospatialPointIndex<E extends GeospatialPoint> implements Geospa
     }
 
     @SuppressWarnings("unchecked")
-    public List<E> getAllPointsInBoundingBox(final double west, final double east, final double north, final double south) {
+    public List<E> getAllPointsInBoundingBox(final double south, final double west, final double north, final double east) {
         final GeospatialPoint centroid;
         {
             // Via http://www.movable-type.co.uk/scripts/latlong.html
@@ -56,7 +56,7 @@ public class VPGeospatialPointIndex<E extends GeospatialPoint> implements Geospa
         final ArrayList<E> points = new ArrayList<E>();
 
         for (final E point : (List<E>)this.vpTree.getAllWithinRange(centroid, searchRadius)) {
-            if (point.getLatitude() < north && point.getLatitude() > south) {
+            if (point.getLatitude() <= north && point.getLatitude() >= south) {
                 // If the point is inside the bounding box, it will be shorter to get to the point by traveling east
                 // from the western boundary than by traveling east from the eastern boundary.
                 if (this.getDegreesEastFromMeridian(west, point) <= this.getDegreesEastFromMeridian(east, point)) {
