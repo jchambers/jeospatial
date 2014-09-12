@@ -10,7 +10,7 @@ import com.eatthepath.jvptree.DistanceFunction;
  *
  * @param <T>
  */
-public class HaversineDistanceFunction<T extends GeospatialPoint> implements DistanceFunction<T> {
+public class HaversineDistanceFunction implements DistanceFunction<GeospatialPoint> {
 
     private static final double EARTH_RADIUS = 6371000; // meters
 
@@ -22,7 +22,7 @@ public class HaversineDistanceFunction<T extends GeospatialPoint> implements Dis
      * 
      * @return the "great circle" distance in meters between the given points
      */
-    public double getDistance(final T firstPoint, final T secondPoint) {
+    public double getDistance(final GeospatialPoint firstPoint, final GeospatialPoint secondPoint) {
         final double lat1 = Math.toRadians(firstPoint.getLatitude());
         final double lon1 = Math.toRadians(firstPoint.getLongitude());
         final double lat2 = Math.toRadians(secondPoint.getLatitude());

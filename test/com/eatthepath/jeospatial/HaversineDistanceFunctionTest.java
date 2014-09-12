@@ -8,8 +8,8 @@ public class HaversineDistanceFunctionTest {
 
     @Test
     public void testGetDistance() {
-        final HaversineDistanceFunction<SimpleGeospatialPoint> distanceFunction =
-                new HaversineDistanceFunction<SimpleGeospatialPoint>();
+        final HaversineDistanceFunction distanceFunction =
+                new HaversineDistanceFunction();
 
         final SimpleGeospatialPoint BOS = new SimpleGeospatialPoint(42.3631, -71.0064);
         final SimpleGeospatialPoint LAX = new SimpleGeospatialPoint(33.9425, -118.4072);

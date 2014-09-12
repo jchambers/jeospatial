@@ -12,7 +12,7 @@ public class VPTreeGeospatialPointIndex<E extends GeospatialPoint> implements Ge
     private final VPTree<GeospatialPoint> vpTree;
 
     public VPTreeGeospatialPointIndex() {
-        this.vpTree = new VPTree<GeospatialPoint>(new HaversineDistanceFunction<GeospatialPoint>());
+        this.vpTree = new VPTree<GeospatialPoint>(new HaversineDistanceFunction());
     }
 
     @SuppressWarnings("unchecked")
@@ -39,10 +39,7 @@ public class VPTreeGeospatialPointIndex<E extends GeospatialPoint> implements Ge
 
         final double searchRadius;
         {
-            final HaversineDistanceFunction<GeospatialPoint> distanceFunction =
-                    new HaversineDistanceFunction<GeospatialPoint>();
-
-            searchRadius = distanceFunction.getDistance(centroid, new GeospatialPoint() {
+            searchRadius = new HaversineDistanceFunction().getDistance(centroid, new GeospatialPoint() {
                 public double getLongitude() {
                     return east;
                 }
