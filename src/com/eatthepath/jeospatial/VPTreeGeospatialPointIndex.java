@@ -7,11 +7,11 @@ import java.util.List;
 
 import com.eatthepath.jvptree.VPTree;
 
-public class VPGeospatialPointIndex<E extends GeospatialPoint> implements GeospatialIndex<E> {
+public class VPTreeGeospatialPointIndex<E extends GeospatialPoint> implements GeospatialIndex<E> {
 
     private final VPTree<GeospatialPoint> vpTree;
 
-    public VPGeospatialPointIndex() {
+    public VPTreeGeospatialPointIndex() {
         this.vpTree = new VPTree<GeospatialPoint>(new HaversineDistanceFunction<GeospatialPoint>());
     }
 

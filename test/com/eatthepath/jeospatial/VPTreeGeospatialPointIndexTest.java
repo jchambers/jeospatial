@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-public class VPGeospatialPointIndexTest {
+public class VPTreeGeospatialPointIndexTest {
 
     @Test
     public void testGetAllPointsInBoundingBox() {
@@ -28,7 +28,7 @@ public class VPGeospatialPointIndexTest {
                 new SimpleGeospatialPoint(0, 2)
         });
 
-        final VPGeospatialPointIndex<SimpleGeospatialPoint> index = new VPGeospatialPointIndex<SimpleGeospatialPoint>();
+        final VPTreeGeospatialPointIndex<SimpleGeospatialPoint> index = new VPTreeGeospatialPointIndex<SimpleGeospatialPoint>();
         index.addAll(points);
 
         final List<SimpleGeospatialPoint> pointsInBox = index.getAllPointsInBoundingBox(-2, -2, 2, 2);
