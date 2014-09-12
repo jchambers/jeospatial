@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
-import com.eatthepath.jeospatial.util.SimpleGeospatialPoint;
+import com.eatthepath.jeospatial.GeospatialPoint;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -20,13 +20,16 @@ import au.com.bytecode.opencsv.CSVReader;
  * 
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  */
-public class ZipCode extends SimpleGeospatialPoint {
+public class ZipCode implements GeospatialPoint {
     public static final String DEFAULT_DATA_FILE = "data/zips.csv";
-    
+
     private final int code;
     private final String city;
     private final String state;
-    
+
+    private final double latitude;
+    private final double longitude;
+
     /**
      * Constructs a new {@code ZipCode} with the given numeric zip code, city
      * name, state abbreviation, latitude, and longitude.
@@ -44,13 +47,14 @@ public class ZipCode extends SimpleGeospatialPoint {
      *            the longitude of the approximate center of this region
      */
     public ZipCode(int code, String city, String state, double latitude, double longitude) {
-        super(latitude, longitude);
-        
         this.code = code;
         this.city = city;
         this.state = state;
+
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
-    
+
     /**
      * Returns the numeric five-digit code associated with this region.
      * 
@@ -59,7 +63,7 @@ public class ZipCode extends SimpleGeospatialPoint {
     public int getCode() {
         return this.code;
     }
-    
+
     /**
      * Returns the name of the city in which this zip code is located.
      * 
@@ -68,7 +72,7 @@ public class ZipCode extends SimpleGeospatialPoint {
     public String getCity() {
         return this.city;
     }
-    
+
     /**
      * Returns the two-letter abbreviation of the state in which this zip code
      * is located.
@@ -79,7 +83,15 @@ public class ZipCode extends SimpleGeospatialPoint {
     public String getState() {
         return this.state;
     }
-    
+
+    public double getLatitude() {
+        return this.latitude;
+    }
+
+    public double getLongitude() {
+        return this.longitude;
+    }
+
     /**
      * Loads all zip codes from a default CSV file ({@value DEFAULT_DATA_FILE}).
      * 
@@ -92,7 +104,7 @@ public class ZipCode extends SimpleGeospatialPoint {
     public static List<ZipCode> loadAllFromCsvFile() throws IOException {
         return ZipCode.loadAllFromCsvFile("data/zips.csv");
     }
-    
+
     /**
      * Loads all zip codes from the file at the given path.
      * 
@@ -107,7 +119,7 @@ public class ZipCode extends SimpleGeospatialPoint {
     public static List<ZipCode> loadAllFromCsvFile(String path) throws IOException {
         return ZipCode.loadAllFromCsvFile(new File(path));
     }
-    
+
     /**
      * Returns a list of all zip codes contained in the given file.
      * 
@@ -121,24 +133,24 @@ public class ZipCode extends SimpleGeospatialPoint {
      */
     public static List<ZipCode> loadAllFromCsvFile(File file) throws IOException {
         CSVReader reader = new CSVReader(new FileReader(file));
-        
+
         ArrayList<ZipCode> zipCodes = new ArrayList<ZipCode>();
-        
+
         try {
             String[] row = reader.readNext();
-            
+
             while(row != null) {
                 double longitude = -Double.parseDouble(row[4]);
                 double latitude = Double.parseDouble(row[5]);
-                
+
                 zipCodes.add(new ZipCode(Integer.parseInt(row[1]), row[3], row[2], latitude, longitude));
-                
+
                 row = reader.readNext();
             }
         } finally {
             reader.close();
         }
-        
+
         return zipCodes;
     }
 
