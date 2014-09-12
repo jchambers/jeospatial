@@ -12,7 +12,13 @@ public class VPTreeGeospatialPointIndex<E extends GeospatialPoint> implements Ge
     private final VPTree<GeospatialPoint> vpTree;
 
     public VPTreeGeospatialPointIndex() {
-        this.vpTree = new VPTree<GeospatialPoint>(new HaversineDistanceFunction());
+        this(null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public VPTreeGeospatialPointIndex(final Collection<E> points) {
+        this.vpTree = new VPTree<GeospatialPoint>(
+                new HaversineDistanceFunction(), (Collection<GeospatialPoint>) points);
     }
 
     @SuppressWarnings("unchecked")

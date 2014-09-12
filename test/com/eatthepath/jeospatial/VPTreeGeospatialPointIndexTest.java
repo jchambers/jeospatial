@@ -28,8 +28,8 @@ public class VPTreeGeospatialPointIndexTest {
                 new SimpleGeospatialPoint(0, 2)
         });
 
-        final VPTreeGeospatialPointIndex<SimpleGeospatialPoint> index = new VPTreeGeospatialPointIndex<SimpleGeospatialPoint>();
-        index.addAll(points);
+        final VPTreeGeospatialPointIndex<SimpleGeospatialPoint> index =
+                new VPTreeGeospatialPointIndex<SimpleGeospatialPoint>(points);
 
         final List<SimpleGeospatialPoint> pointsInBox = index.getAllPointsInBoundingBox(-2, -2, 2, 2);
 
