@@ -104,12 +104,12 @@ public class VPTreeGeospatialPointIndex<E extends GeospatialPoint> implements Ge
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends E> List<E> getNearestNeighbors(T queryPoint, int maxResults) {
+    public List<E> getNearestNeighbors(final GeospatialPoint queryPoint, final int maxResults) {
         return (List<E>) this.vpTree.getNearestNeighbors(queryPoint, maxResults);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends E> List<E> getAllWithinRange(T queryPoint, double maxDistance) {
+    public List<E> getAllWithinRange(final GeospatialPoint queryPoint, final double maxDistance) {
         return (List<E>) this.vpTree.getAllWithinRange(queryPoint, maxDistance);
     }
 
