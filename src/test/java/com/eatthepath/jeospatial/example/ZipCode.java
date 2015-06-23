@@ -1,14 +1,6 @@
 package com.eatthepath.jeospatial.example;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
-
 import com.eatthepath.jeospatial.GeospatialPoint;
-
-import au.com.bytecode.opencsv.CSVReader;
 
 
 /**
@@ -17,7 +9,7 @@ import au.com.bytecode.opencsv.CSVReader;
  * superclass, a {@code ZipCode} also contains the numeric five-digit zip code
  * (as an integer that may be missing leading zeroes) of the region, as well as
  * the name of the city in state in which the zip code is located.</p>
- * 
+ *
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  */
 public class ZipCode implements GeospatialPoint {
@@ -33,7 +25,7 @@ public class ZipCode implements GeospatialPoint {
     /**
      * Constructs a new {@code ZipCode} with the given numeric zip code, city
      * name, state abbreviation, latitude, and longitude.
-     * 
+     *
      * @param code
      *            the five-digit numeric zip code for the region
      * @param city
@@ -57,7 +49,7 @@ public class ZipCode implements GeospatialPoint {
 
     /**
      * Returns the numeric five-digit code associated with this region.
-     * 
+     *
      * @return the numeric zip code of this region
      */
     public int getCode() {
@@ -66,7 +58,7 @@ public class ZipCode implements GeospatialPoint {
 
     /**
      * Returns the name of the city in which this zip code is located.
-     * 
+     *
      * @return the name of the city in which this zip code is located
      */
     public String getCity() {
@@ -76,7 +68,7 @@ public class ZipCode implements GeospatialPoint {
     /**
      * Returns the two-letter abbreviation of the state in which this zip code
      * is located.
-     * 
+     *
      * @return the two-letter abbreviation of the state in which this zip code
      *         is located
      */
@@ -90,68 +82,6 @@ public class ZipCode implements GeospatialPoint {
 
     public double getLongitude() {
         return this.longitude;
-    }
-
-    /**
-     * Loads all zip codes from a default CSV file ({@value DEFAULT_DATA_FILE}).
-     * 
-     * @return a list of all zip codes contained in the default data file
-     * 
-     * @throws IOException
-     *             in the event of any kind of error in loading zip codes from
-     *             the data file
-     */
-    public static List<ZipCode> loadAllFromCsvFile() throws IOException {
-        return ZipCode.loadAllFromCsvFile("data/zips.csv");
-    }
-
-    /**
-     * Loads all zip codes from the file at the given path.
-     * 
-     * @param path the path to the file containing zip code data
-     * 
-     * @return a list of all zip codes contained in the file at the given path
-     * 
-     * @throws IOException
-     *             in the event of any kind of error in loading zip codes from
-     *             the data file
-     */
-    public static List<ZipCode> loadAllFromCsvFile(String path) throws IOException {
-        return ZipCode.loadAllFromCsvFile(new File(path));
-    }
-
-    /**
-     * Returns a list of all zip codes contained in the given file.
-     * 
-     * @param file the file from which to load zip codes
-     * 
-     * @return a list of all zip codes contained in the given file
-     * 
-     * @throws IOException
-     *             in the event of any kind of error in loading zip codes from
-     *             the data file
-     */
-    public static List<ZipCode> loadAllFromCsvFile(File file) throws IOException {
-        CSVReader reader = new CSVReader(new FileReader(file));
-
-        ArrayList<ZipCode> zipCodes = new ArrayList<ZipCode>();
-
-        try {
-            String[] row = reader.readNext();
-
-            while(row != null) {
-                double longitude = -Double.parseDouble(row[4]);
-                double latitude = Double.parseDouble(row[5]);
-
-                zipCodes.add(new ZipCode(Integer.parseInt(row[1]), row[3], row[2], latitude, longitude));
-
-                row = reader.readNext();
-            }
-        } finally {
-            reader.close();
-        }
-
-        return zipCodes;
     }
 
     /* (non-Javadoc)

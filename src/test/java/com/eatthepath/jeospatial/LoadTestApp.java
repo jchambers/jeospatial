@@ -1,19 +1,19 @@
 package com.eatthepath.jeospatial;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import com.eatthepath.jeospatial.example.ZipCode;
+import com.eatthepath.jeospatial.example.ZipCodeLoader;
 import com.eatthepath.jvptree.DistanceComparator;
 
 /**
  * A crude test app that loads a bunch of zip codes, builds a vp-tree and
  * performs some searches. The point here is to use a dataset that's larger
  * than would be practical to use during normal unit tests.
- * 
+ *
  * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  */
 public class LoadTestApp {
@@ -22,7 +22,7 @@ public class LoadTestApp {
         final HaversineDistanceFunction distanceFunction = new HaversineDistanceFunction();
 
         long start = System.currentTimeMillis();
-        final List<ZipCode> zipCodes = ZipCode.loadAllFromCsvFile(new File("data/zips.csv"));
+        final List<ZipCode> zipCodes = ZipCodeLoader.loadAllZipCodes();
         long end = System.currentTimeMillis();
 
         System.out.format("Loaded %d zip codes in %d milliseconds.%n", zipCodes.size(), end - start);
