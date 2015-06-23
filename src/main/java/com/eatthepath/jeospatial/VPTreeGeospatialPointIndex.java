@@ -58,7 +58,7 @@ public class VPTreeGeospatialPointIndex<E extends GeospatialPoint> implements Ge
 
         final ArrayList<E> points = new ArrayList<E>();
 
-        for (final E point : (List<E>)this.vpTree.getAllWithinRange(centroid, searchRadius)) {
+        for (final E point : (List<E>)this.vpTree.getAllWithinDistance(centroid, searchRadius)) {
             if (point.getLatitude() <= north && point.getLatitude() >= south) {
                 // If the point is inside the bounding box, it will be shorter to get to the point by traveling east
                 // from the western boundary than by traveling east from the eastern boundary.
@@ -110,7 +110,7 @@ public class VPTreeGeospatialPointIndex<E extends GeospatialPoint> implements Ge
 
     @SuppressWarnings("unchecked")
     public List<E> getAllWithinRange(final GeospatialPoint queryPoint, final double maxDistance) {
-        return (List<E>) this.vpTree.getAllWithinRange(queryPoint, maxDistance);
+        return (List<E>) this.vpTree.getAllWithinDistance(queryPoint, maxDistance);
     }
 
     public int size() {

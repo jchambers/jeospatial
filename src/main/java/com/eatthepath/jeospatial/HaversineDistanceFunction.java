@@ -5,21 +5,21 @@ import com.eatthepath.jvptree.DistanceFunction;
 /**
  * A distance function that calculates the "great circle" distance between two points on the earth's surface using the
  * Haversine formula.
- * 
+ *
  * @author <a href="https://github.com/jchambers">Jon Chambers</a>
  *
  * @param <T>
  */
 public class HaversineDistanceFunction implements DistanceFunction<GeospatialPoint> {
 
-    private static final double EARTH_RADIUS = 6371000; // meters
+    private static final double EARTH_RADIUS = 6371e3; // meters
 
     /**
      * Returns the "great cricle" distance in meters between two points on the earth's surface.
-     * 
+     *
      * @param firstPoint the first geospatial point
      * @param secondPoint the second geospatial point
-     * 
+     *
      * @return the "great circle" distance in meters between the given points
      */
     public double getDistance(final GeospatialPoint firstPoint, final GeospatialPoint secondPoint) {
@@ -28,21 +28,21 @@ public class HaversineDistanceFunction implements DistanceFunction<GeospatialPoi
         final double lat2 = Math.toRadians(secondPoint.getLatitude());
         final double lon2 = Math.toRadians(secondPoint.getLongitude());
 
-        final double angle = 2 * Math.asin(Math.min(1, Math.sqrt(this.haversine(lat2 - lat1) + Math.cos(lat1) * Math.cos(lat2) * this.haversine(lon2 - lon1))));
+        final double angle = 2 * Math.asin(Math.min(1, Math.sqrt(haversine(lat2 - lat1) + Math.cos(lat1) * Math.cos(lat2) * haversine(lon2 - lon1))));
 
         return angle * HaversineDistanceFunction.EARTH_RADIUS;
     }
 
     /**
      * Returns the haversine of the given angle.
-     * 
+     *
      * @param theta the angle, in radians, for which to calculate the haversine
-     * 
+     *
      * @return the haversine of the given angle
-     * 
+     *
      * @see http://en.wikipedia.org/wiki/Versine
      */
-    private double haversine(final double theta) {
+    private static double haversine(final double theta) {
         final double x = Math.sin(theta / 2);
         return (x * x);
     }
