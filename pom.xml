@@ -5,42 +5,6 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>jeospatial</name>
   <description>A geospatial point index library for Java</description>
-  <build>
-    <sourceDirectory>example</sourceDirectory>
-    <testSourceDirectory>test</testSourceDirectory>
-    <resources>
-      <resource>
-        <directory>example</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-      <resource>
-        <directory>src</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-    </resources>
-    <testResources>
-      <testResource>
-        <directory>test</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </testResource>
-    </testResources>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <source/>
-          <target/>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
   	<dependency>
   		<groupId>com.eatthepath</groupId>
