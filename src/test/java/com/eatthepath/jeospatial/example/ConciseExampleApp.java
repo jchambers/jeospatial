@@ -43,7 +43,7 @@ public class ConciseExampleApp {
         SimpleGeospatialPoint davisSquare = new SimpleGeospatialPoint(42.396745, -71.122479);
 
         // Find all zip codes within ten kilometers of Davis Square
-        List<ZipCode> zipCodesWithinRange = index.getAllWithinRange(davisSquare, 10e3);
+        List<ZipCode> zipCodesWithinRange = index.getAllWithinDistance(davisSquare, 10e3);
 
         ConciseExampleApp.printZipCodeList("All zip codes within 10km of Davis Square:", zipCodesWithinRange);
     }

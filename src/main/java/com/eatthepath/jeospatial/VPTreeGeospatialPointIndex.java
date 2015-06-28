@@ -109,7 +109,7 @@ public class VPTreeGeospatialPointIndex<E extends GeospatialPoint> implements Ge
     }
 
     @SuppressWarnings("unchecked")
-    public List<E> getAllWithinRange(final GeospatialPoint queryPoint, final double maxDistance) {
+    public List<E> getAllWithinDistance(final GeospatialPoint queryPoint, final double maxDistance) {
         return (List<E>) this.vpTree.getAllWithinDistance(queryPoint, maxDistance);
     }
 

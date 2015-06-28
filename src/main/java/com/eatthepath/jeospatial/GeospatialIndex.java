@@ -39,7 +39,7 @@ public interface GeospatialIndex<E extends GeospatialPoint> extends Collection<E
      * @return a list of all points within the given distance to the query point; the returned list is sorted in order
      * of increasing distance from the query point
      */
-    public List<E> getAllWithinRange(GeospatialPoint queryPoint, double maxDistance);
+    public List<E> getAllWithinDistance(GeospatialPoint queryPoint, double maxDistance);
 
     /**
      * Returns a list of all points in the index within the given bounding "box." A point is considered to be inside the
