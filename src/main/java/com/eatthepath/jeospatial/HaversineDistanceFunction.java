@@ -7,10 +7,8 @@ import com.eatthepath.jvptree.DistanceFunction;
  * Haversine formula.
  *
  * @author <a href="https://github.com/jchambers">Jon Chambers</a>
- *
- * @param <T>
  */
-public class HaversineDistanceFunction implements DistanceFunction<GeospatialPoint> {
+class HaversineDistanceFunction implements DistanceFunction<GeospatialPoint> {
 
     private static final double EARTH_RADIUS = 6371e3; // meters
 

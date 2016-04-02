@@ -30,8 +30,8 @@ public class LoadTestApp {
         // Now put all of those zip codes into a vp-tree
         start = System.currentTimeMillis();
 
-        final VPTreeGeospatialPointIndex<ZipCode> zipCodeTree =
-                new VPTreeGeospatialPointIndex<ZipCode>(zipCodes);
+        final VPTreeGeospatialIndex<ZipCode> zipCodeTree =
+                new VPTreeGeospatialIndex<ZipCode>(zipCodes);
 
         end = System.currentTimeMillis();
 

@@ -2,26 +2,20 @@ package com.eatthepath.jeospatial;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import com.eatthepath.jvptree.VPTree;
 
-public class VPTreeGeospatialPointIndex<E extends GeospatialPoint> implements GeospatialIndex<E> {
+public class VPTreeGeospatialIndex<E extends GeospatialPoint> extends VPTree<GeospatialPoint, E> implements GeospatialIndex<E> {
 
-    private final VPTree<GeospatialPoint> vpTree;
-
-    public VPTreeGeospatialPointIndex() {
-        this(null);
+    public VPTreeGeospatialIndex() {
+        super(new HaversineDistanceFunction());
     }
 
-    @SuppressWarnings("unchecked")
-    public VPTreeGeospatialPointIndex(final Collection<E> points) {
-        this.vpTree = new VPTree<GeospatialPoint>(
-                new HaversineDistanceFunction(), (Collection<GeospatialPoint>) points);
+    public VPTreeGeospatialIndex(final Collection<E> points) {
+        super(new HaversineDistanceFunction(), points);
     }
 
-    @SuppressWarnings("unchecked")
     public List<E> getAllPointsInBoundingBox(final double south, final double west, final double north, final double east) {
         final GeospatialPoint centroid;
         {
@@ -58,7 +52,7 @@ public class VPTreeGeospatialPointIndex<E extends GeospatialPoint> implements Ge
 
         final ArrayList<E> points = new ArrayList<E>();
 
-        for (final E point : (List<E>)this.vpTree.getAllWithinDistance(centroid, searchRadius)) {
+        for (final E point : this.getAllWithinDistance(centroid, searchRadius)) {
             if (point.getLatitude() <= north && point.getLatitude() >= south) {
                 // If the point is inside the bounding box, it will be shorter to get to the point by traveling east
                 // from the western boundary than by traveling east from the eastern boundary.
@@ -78,13 +72,13 @@ public class VPTreeGeospatialPointIndex<E extends GeospatialPoint> implements Ge
     /**
      * Calculates the minimum eastward angle traveled from a meridian to a point. If the point is coincident with the
      * meridian, this method returns 360 degrees.
-     * 
+     *
      * @param longitude the line of longitude at which to begin travel
      * @param point the point to which to travel
-     * 
+     *
      * @return the eastward-traveling distance between the line and the point in degrees
      */
-    private double getDegreesEastFromMeridian(double longitude, E point) {
+    private double getDegreesEastFromMeridian(final double longitude, final E point) {
         return point.getLongitude() > longitude ?
                 point.getLongitude() - longitude : Math.abs(360 - (point.getLongitude() - longitude));
     }
@@ -92,77 +86,14 @@ public class VPTreeGeospatialPointIndex<E extends GeospatialPoint> implements Ge
     /**
      * Calculates the minimum westward angle traveled from a meridian to a point. If the point is coincident with the
      * meridian, this method returns 360 degrees.
-     * 
+     *
      * @param longitude the line of longitude at which to begin travel
      * @param point the point to which to travel
-     * 
+     *
      * @return the westward-traveling distance between the line and the point in degrees
      */
-    private double getDegreesWestFromMeridian(double longitude, E point) {
+    private double getDegreesWestFromMeridian(final double longitude, final E point) {
         return point.getLongitude() < longitude ?
                 longitude - point.getLongitude() : Math.abs(360 - (longitude - point.getLongitude()));
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<E> getNearestNeighbors(final GeospatialPoint queryPoint, final int maxResults) {
-        return (List<E>) this.vpTree.getNearestNeighbors(queryPoint, maxResults);
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<E> getAllWithinDistance(final GeospatialPoint queryPoint, final double maxDistance) {
-        return (List<E>) this.vpTree.getAllWithinDistance(queryPoint, maxDistance);
-    }
-
-    public int size() {
-        return this.vpTree.size();
-    }
-
-    public boolean isEmpty() {
-        return this.vpTree.isEmpty();
-    }
-
-    public boolean contains(Object o) {
-        return this.vpTree.contains(o);
-    }
-
-    @SuppressWarnings("unchecked")
-    public Iterator<E> iterator() {
-        return (Iterator<E>) this.vpTree.iterator();
-    }
-
-    public Object[] toArray() {
-        return this.vpTree.toArray();
-    }
-
-    public <T> T[] toArray(T[] a) {
-        return this.vpTree.toArray(a);
-    }
-
-    public boolean add(E e) {
-        return this.vpTree.add(e);
-    }
-
-    public boolean remove(Object o) {
-        return this.vpTree.remove(o);
-    }
-
-    public boolean containsAll(Collection<?> c) {
-        return this.vpTree.containsAll(c);
-    }
-
-    public boolean addAll(Collection<? extends E> c) {
-        return this.vpTree.addAll(c);
-    }
-
-    public boolean removeAll(Collection<?> c) {
-        return this.vpTree.removeAll(c);
-    }
-
-    public boolean retainAll(Collection<?> c) {
-        return this.vpTree.retainAll(c);
-    }
-
-    public void clear() {
-        this.vpTree.clear();
     }
 }

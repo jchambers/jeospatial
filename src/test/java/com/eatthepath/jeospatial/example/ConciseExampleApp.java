@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.eatthepath.jeospatial.GeospatialIndex;
 import com.eatthepath.jeospatial.SimpleGeospatialPoint;
-import com.eatthepath.jeospatial.VPTreeGeospatialPointIndex;
+import com.eatthepath.jeospatial.VPTreeGeospatialIndex;
 
 /**
  * A very simple test application that shows the very basics of using a
@@ -23,7 +23,7 @@ public class ConciseExampleApp {
     public static void getTenClosestNeighbors() throws IOException {
         // Load a bunch of zip codes from a file and construct a vp-tree from those points
         List<ZipCode> zipCodes = ZipCodeLoader.loadAllZipCodes();
-        GeospatialIndex<ZipCode> index = new VPTreeGeospatialPointIndex<ZipCode>(zipCodes);
+        GeospatialIndex<ZipCode> index = new VPTreeGeospatialIndex<ZipCode>(zipCodes);
 
         // Pick a query point (Davis Square in Somerville, MA, USA)
         SimpleGeospatialPoint davisSquare = new SimpleGeospatialPoint(42.396745, -71.122479);
@@ -37,7 +37,7 @@ public class ConciseExampleApp {
     public static void getAllWithinRange() throws IOException {
         // Load a bunch of zip codes from a file and construct a vp-tree from those points
         List<ZipCode> zipCodes = ZipCodeLoader.loadAllZipCodes();
-        GeospatialIndex<ZipCode> index = new VPTreeGeospatialPointIndex<ZipCode>(zipCodes);
+        GeospatialIndex<ZipCode> index = new VPTreeGeospatialIndex<ZipCode>(zipCodes);
 
         // Pick a query point (Davis Square in Somerville, MA, USA)
         SimpleGeospatialPoint davisSquare = new SimpleGeospatialPoint(42.396745, -71.122479);
@@ -51,7 +51,7 @@ public class ConciseExampleApp {
     public static void getAllInBoundingBox() throws IOException {
         // Load a bunch of zip codes from a file and construct a vp-tree from those points
         List<ZipCode> zipCodes = ZipCodeLoader.loadAllZipCodes();
-        GeospatialIndex<ZipCode> index = new VPTreeGeospatialPointIndex<ZipCode>(zipCodes);
+        GeospatialIndex<ZipCode> index = new VPTreeGeospatialIndex<ZipCode>(zipCodes);
 
         // Find all of the zip codes in a bounding "box"
         List<ZipCode> inBoundingBox = index.getAllPointsInBoundingBox(-75, -70, 43, 42);
