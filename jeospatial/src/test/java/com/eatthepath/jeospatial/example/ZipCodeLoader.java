@@ -5,14 +5,14 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVReader;
 
 public class ZipCodeLoader {
 
     public static List<ZipCode> loadAllZipCodes() throws IOException {
 
         final CSVReader reader = new CSVReader(new InputStreamReader(ZipCodeLoader.class.getResourceAsStream("/zips.csv")));
-        final ArrayList<ZipCode> zipCodes = new ArrayList<ZipCode>();
+        final ArrayList<ZipCode> zipCodes = new ArrayList<>();
 
         try {
             String[] row = reader.readNext();
