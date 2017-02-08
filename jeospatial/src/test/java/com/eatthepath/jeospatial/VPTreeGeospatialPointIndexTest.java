@@ -29,7 +29,7 @@ public class VPTreeGeospatialPointIndexTest {
         });
 
         final VPTreeGeospatialIndex<SimpleGeospatialPoint> index =
-                new VPTreeGeospatialIndex<SimpleGeospatialPoint>(points);
+                new VPTreeGeospatialIndex<>(points);
 
         final List<SimpleGeospatialPoint> pointsInBox = index.getAllPointsInBoundingBox(-2, -2, 2, 2);
 
