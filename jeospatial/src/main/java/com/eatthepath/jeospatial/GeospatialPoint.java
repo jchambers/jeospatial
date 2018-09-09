@@ -6,6 +6,7 @@ package com.eatthepath.jeospatial;
  * @author <a href="jon.chambers@gmail.com">Jon Chambers</a>
  */
 public interface GeospatialPoint {
+
     /**
      * Returns the latitude of this point.
      * 

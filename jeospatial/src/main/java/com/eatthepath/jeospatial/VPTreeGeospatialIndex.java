@@ -42,38 +42,13 @@ public class VPTreeGeospatialIndex<E extends GeospatialPoint> extends VPTree<Geo
             final double latitude = Math.atan2(Math.sin(south) + Math.sin(north), Math.sqrt((Math.cos(south) + Bx) * (Math.cos(south) + Bx) + (By * By)));
             final double longitude = west + Math.atan2(By, Math.cos(south) + Bx);
 
-            centroid = new GeospatialPoint() {
-                public double getLongitude() {
-                    return longitude;
-                }
-
-                public double getLatitude() {
-                    return latitude;
-                }
-            };
+            centroid = new SimpleGeospatialPoint(latitude, longitude);
         }
 
         final double searchRadius;
         {
-            final double distanceToNorthEastPoint = HAVERSINE_DISTANCE_FUNCTION.getDistance(centroid, new GeospatialPoint() {
-                public double getLongitude() {
-                    return east;
-                }
-
-                public double getLatitude() {
-                    return north;
-                }
-            });
-
-            final double distanceToSouthWestPoint = HAVERSINE_DISTANCE_FUNCTION.getDistance(centroid, new GeospatialPoint() {
-                public double getLongitude() {
-                    return west;
-                }
-
-                public double getLatitude() {
-                    return south;
-                }
-            });
+            final double distanceToNorthEastPoint = HAVERSINE_DISTANCE_FUNCTION.getDistance(centroid, new SimpleGeospatialPoint(north, east));
+            final double distanceToSouthWestPoint = HAVERSINE_DISTANCE_FUNCTION.getDistance(centroid, new SimpleGeospatialPoint(south, west));
 
             searchRadius = Math.max(distanceToNorthEastPoint, distanceToSouthWestPoint);
         }

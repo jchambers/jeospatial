@@ -63,17 +63,6 @@ public class VPTreeConstructionBenchmark {
         final double latitude = (this.random.nextDouble() * 180.0) - 90;
         final double longitude = (this.random.nextDouble() * 360.0) - 180;
 
-        return new GeospatialPoint() {
-
-            @Override
-            public double getLongitude() {
-                return longitude;
-            }
-
-            @Override
-            public double getLatitude() {
-                return latitude;
-            }
-        };
+        return new SimpleGeospatialPoint(latitude, longitude);
     }
 }
