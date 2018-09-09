@@ -38,7 +38,7 @@ class HaversineDistanceFunction implements DistanceFunction<GeospatialPoint> {
      *
      * @return the haversine of the given angle
      *
-     * @see http://en.wikipedia.org/wiki/Versine
+     * @see <a href="https://en.wikipedia.org/wiki/Versine">Versine - Wikipedia</a>
      */
     private static double haversine(final double theta) {
         final double x = Math.sin(theta / 2);

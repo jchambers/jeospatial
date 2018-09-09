@@ -11,7 +11,7 @@ public interface GeospatialPoint {
      * 
      * @return the latitude of this point in degrees
      */
-    public double getLatitude();
+    double getLatitude();
 
     /**
      * Returns the longitude of this point. The returned longitude should be
@@ -20,5 +20,5 @@ public interface GeospatialPoint {
      * 
      * @return the longitude of this point in degrees
      */
-    public double getLongitude();
+    double getLongitude();
 }

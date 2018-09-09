@@ -4,19 +4,35 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.eatthepath.jvptree.PointFilter;
 import com.eatthepath.jvptree.VPTree;
 
 public class VPTreeGeospatialIndex<E extends GeospatialPoint> extends VPTree<GeospatialPoint, E> implements GeospatialIndex<E> {
 
+    private static final PointFilter NO_OP_POINT_FILTER = new PointFilter() {
+        @Override
+        public boolean allowPoint(final Object point) {
+            return true;
+        }
+    };
+
+    private static final HaversineDistanceFunction HAVERSINE_DISTANCE_FUNCTION = new HaversineDistanceFunction();
+
     public VPTreeGeospatialIndex() {
-        super(new HaversineDistanceFunction());
+        super(HAVERSINE_DISTANCE_FUNCTION);
     }
 
     public VPTreeGeospatialIndex(final Collection<E> points) {
-        super(new HaversineDistanceFunction(), points);
+        super(HAVERSINE_DISTANCE_FUNCTION, points);
     }
 
     public List<E> getAllPointsInBoundingBox(final double south, final double west, final double north, final double east) {
+        //noinspection unchecked
+        return getAllPointsInBoundingBox(south, west, north, east, NO_OP_POINT_FILTER);
+    }
+
+    @Override
+    public List<E> getAllPointsInBoundingBox(final double south, final double west, final double north, final double east, final PointFilter<? super E> filter) {
         final GeospatialPoint centroid;
         {
             // Via http://www.movable-type.co.uk/scripts/latlong.html
@@ -39,7 +55,7 @@ public class VPTreeGeospatialIndex<E extends GeospatialPoint> extends VPTree<Geo
 
         final double searchRadius;
         {
-            searchRadius = new HaversineDistanceFunction().getDistance(centroid, new GeospatialPoint() {
+            final double distanceToNorthEastPoint = HAVERSINE_DISTANCE_FUNCTION.getDistance(centroid, new GeospatialPoint() {
                 public double getLongitude() {
                     return east;
                 }
@@ -48,11 +64,23 @@ public class VPTreeGeospatialIndex<E extends GeospatialPoint> extends VPTree<Geo
                     return north;
                 }
             });
+
+            final double distanceToSouthWestPoint = HAVERSINE_DISTANCE_FUNCTION.getDistance(centroid, new GeospatialPoint() {
+                public double getLongitude() {
+                    return west;
+                }
+
+                public double getLatitude() {
+                    return south;
+                }
+            });
+
+            searchRadius = Math.max(distanceToNorthEastPoint, distanceToSouthWestPoint);
         }
 
-        final ArrayList<E> points = new ArrayList<E>();
+        final ArrayList<E> points = new ArrayList<>();
 
-        for (final E point : this.getAllWithinDistance(centroid, searchRadius)) {
+        for (final E point : this.getAllWithinDistance(centroid, searchRadius, filter)) {
             if (point.getLatitude() <= north && point.getLatitude() >= south) {
                 // If the point is inside the bounding box, it will be shorter to get to the point by traveling east
                 // from the western boundary than by traveling east from the eastern boundary.
