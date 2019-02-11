@@ -21,11 +21,11 @@ public class SimpleGeospatialPoint implements GeospatialPoint {
 
     @Override
     public double getLatitude() {
-        return 0;
+        return this.latitude;
     }
 
     @Override
     public double getLongitude() {
-        return 0;
+        return this.longitude;
     }
 }
