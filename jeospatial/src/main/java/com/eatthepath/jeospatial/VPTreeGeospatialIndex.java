@@ -35,13 +35,21 @@ public class VPTreeGeospatialIndex<E extends GeospatialPoint> extends VPTree<Geo
     public List<E> getAllPointsInBoundingBox(final double south, final double west, final double north, final double east, final PointFilter<? super E> filter) {
         final GeospatialPoint centroid;
         {
+            final double southRad = Math.toRadians(south);
+            final double northRad = Math.toRadians(north);
+            final double westRad = Math.toRadians(west);
+            final double eastRad = Math.toRadians(east);
+
             // Via http://www.movable-type.co.uk/scripts/latlong.html
-            final double Bx = Math.cos(north) * Math.cos(east-west);
-            final double By = Math.cos(north) * Math.sin(east-west);
+            final double Bx = Math.cos(northRad) * Math.cos(eastRad - westRad);
+            final double By = Math.cos(northRad) * Math.sin(eastRad - westRad);
 
-            final double latitude = Math.atan2(Math.sin(south) + Math.sin(north), Math.sqrt((Math.cos(south) + Bx) * (Math.cos(south) + Bx) + (By * By)));
-            final double longitude = west + Math.atan2(By, Math.cos(south) + Bx);
+            final double latitudeRad = Math.atan2(Math.sin(southRad) + Math.sin(northRad), Math.sqrt((Math.cos(southRad) + Bx) * (Math.cos(southRad) + Bx) + (By * By)));
+            final double longitudeRad = westRad + Math.atan2(By, Math.cos(southRad) + Bx);
 
+            final double latitude = Math.toDegrees(latitudeRad);
+            final double longitude = Math.toDegrees(longitudeRad);
+            
             centroid = new SimpleGeospatialPoint(latitude, longitude);
         }
 
@@ -62,7 +70,7 @@ public class VPTreeGeospatialIndex<E extends GeospatialPoint> extends VPTree<Geo
                 if (this.getDegreesEastFromMeridian(west, point) <= this.getDegreesEastFromMeridian(east, point)) {
                     // Similarly, it should be shorter to get to the point by traveling west from the eastern boundary
                     // than by traveling west from the western boundary.
-                    if(this.getDegreesWestFromMeridian(east, point) <= this.getDegreesWestFromMeridian(west, point)) {
+                    if (this.getDegreesWestFromMeridian(east, point) <= this.getDegreesWestFromMeridian(west, point)) {
                         points.add(point);
                     }
                 }
@@ -73,30 +81,34 @@ public class VPTreeGeospatialIndex<E extends GeospatialPoint> extends VPTree<Geo
     }
 
     /**
-     * Calculates the minimum eastward angle traveled from a meridian to a point. If the point is coincident with the
-     * meridian, this method returns 360 degrees.
+     * Calculates the minimum eastward angle traveled from a meridian to a
+     * point. If the point is coincident with the meridian, this method returns
+     * 360 degrees.
      *
      * @param longitude the line of longitude at which to begin travel
      * @param point the point to which to travel
      *
-     * @return the eastward-traveling distance between the line and the point in degrees
+     * @return the eastward-traveling distance between the line and the point in
+     * degrees
      */
     private double getDegreesEastFromMeridian(final double longitude, final E point) {
-        return point.getLongitude() > longitude ?
-                point.getLongitude() - longitude : Math.abs(360 - (point.getLongitude() - longitude));
+        return point.getLongitude() > longitude
+                ? point.getLongitude() - longitude : Math.abs(360 - (point.getLongitude() - longitude));
     }
 
     /**
-     * Calculates the minimum westward angle traveled from a meridian to a point. If the point is coincident with the
-     * meridian, this method returns 360 degrees.
+     * Calculates the minimum westward angle traveled from a meridian to a
+     * point. If the point is coincident with the meridian, this method returns
+     * 360 degrees.
      *
      * @param longitude the line of longitude at which to begin travel
      * @param point the point to which to travel
      *
-     * @return the westward-traveling distance between the line and the point in degrees
+     * @return the westward-traveling distance between the line and the point in
+     * degrees
      */
     private double getDegreesWestFromMeridian(final double longitude, final E point) {
-        return point.getLongitude() < longitude ?
-                longitude - point.getLongitude() : Math.abs(360 - (longitude - point.getLongitude()));
+        return point.getLongitude() < longitude
+                ? longitude - point.getLongitude() : Math.abs(360 - (longitude - point.getLongitude()));
     }
 }
