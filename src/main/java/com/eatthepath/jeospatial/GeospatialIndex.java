@@ -1,9 +1,9 @@
 package com.eatthepath.jeospatial;
 
-import java.util.List;
-
 import com.eatthepath.jvptree.PointFilter;
 import com.eatthepath.jvptree.SpatialIndex;
+
+import java.util.List;
 
 /**
  * A collection of points on the earth's surface that can be searched efficiently to find points near a given query
