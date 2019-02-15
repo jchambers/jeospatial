@@ -4,6 +4,8 @@ import com.eatthepath.jvptree.PointFilter;
 
 /**
  * A point filter that accepts only points that fall within a given bounding box.
+ *
+ * @author <a href="mailto:jon.chambers@gmail.com">Jon Chambers</a>
  */
 class BoundingBoxPointFilter implements PointFilter<GeospatialPoint> {
 
@@ -37,15 +39,13 @@ class BoundingBoxPointFilter implements PointFilter<GeospatialPoint> {
     }
 
     /**
-     * Calculates the minimum eastward angle traveled from a meridian to a
-     * point. If the point is coincident with the meridian, this method returns
-     * 360 degrees.
+     * Calculates the minimum eastward angle traveled from a meridian to a point. If the point is coincident with the
+     * meridian, this method returns 360 degrees.
      *
      * @param longitude the line of longitude at which to begin travel
      * @param point the point to which to travel
      *
-     * @return the eastward-traveling distance between the line and the point in
-     * degrees
+     * @return the eastward-traveling distance between the line and the point in degrees
      */
     private double getDegreesEastFromMeridian(final double longitude, final GeospatialPoint point) {
         return point.getLongitude() > longitude
@@ -53,15 +53,13 @@ class BoundingBoxPointFilter implements PointFilter<GeospatialPoint> {
     }
 
     /**
-     * Calculates the minimum westward angle traveled from a meridian to a
-     * point. If the point is coincident with the meridian, this method returns
-     * 360 degrees.
+     * Calculates the minimum westward angle traveled from a meridian to a point. If the point is coincident with the
+     * meridian, this method returns 360 degrees.
      *
      * @param longitude the line of longitude at which to begin travel
      * @param point the point to which to travel
      *
-     * @return the westward-traveling distance between the line and the point in
-     * degrees
+     * @return the westward-traveling distance between the line and the point in degrees
      */
     private double getDegreesWestFromMeridian(final double longitude, final GeospatialPoint point) {
         return point.getLongitude() < longitude
